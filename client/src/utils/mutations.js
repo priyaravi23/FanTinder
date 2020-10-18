@@ -8,14 +8,14 @@ export const ADD_USER = gql`
                 _id
                 username
                 email
-                bookCount
-                savedBooks {
-                    bookId
-                    title
-                    description
-                    authors
+                movieCount
+                savedMovies {
+                    movieId
+                    name
+                    vote
+                    overview
                     image
-                    link
+                    release
                 }
             }
         }
@@ -30,52 +30,52 @@ export const LOGIN_USER = gql`
                 _id
                 username
                 email
-                bookCount
-                savedBooks {
-                    bookId
-                    title
-                    description
-                    authors
-                    link
+                movieCount
+                savedMovies {
+                    movieId
+                    name
+                    vote
+                    overview
                     image
-         }
-       }
-     }
-   }
-`;
-
-export const SAVE_BOOK = gql`
-    mutation saveBook($input: bookInput!) {
-        saveBook(input: $input) {
-            _id
-            username
-            email
-            savedBooks {
-                bookId
-                authors
-                image
-                description
-                title
-                link
+                    release
+                }
             }
         }
     }
 `;
 
-export const REMOVE_BOOK = gql`
-    mutation removeBook($bookId: String!) {
-        removeBook(bookId: $bookId) {
+export const SAVE_MOVIE = gql`
+    mutation saveMovie($input: movieInput!) {
+        saveMovie(input: $input) {
             _id
             username
             email
-            bookCount
-            savedBooks {
-                bookId
-                authors
+            savedMovies {
+                movieId
+                name
+                vote
+                overview
                 image
-                description
-                title
-                link
+                release
+            }
+        }
+    }
+`;
+
+export const REMOVE_MOVIE = gql`
+    mutation removeMovie($movieId: Int!) {
+        removeMovie(movieId: $movieId) {
+            _id
+            username
+            email
+            movieCount
+            savedMovies {
+                movieId
+                name
+                vote
+                overview
+                image
+                release
             }
         }
     }
