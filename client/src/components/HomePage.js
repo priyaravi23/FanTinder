@@ -27,7 +27,7 @@ class Homepage extends Component {
             <section className="my-5 homepage">
                 <div className="home-container">
 
-                    <p className="display-4 home-text">Keep Track of Movies Your Way.</p>
+                    <p className="display-4 home-text">Track your favorite movies</p>
 
                     <Form onSubmit={(event) => {this.props.handleFormSubmit(event, this.state.searchInput)}}>
                         <div className="home-input">
@@ -38,7 +38,7 @@ class Homepage extends Component {
                                     onChange={(e) => this.setSearchInput(e.target.value)}
                                     type='text'
                                     size='lg'
-                                    placeholder='The Dark Knight'
+                                    placeholder='The Lord of the Rings'
                                 />
                             </InputGroup>
 

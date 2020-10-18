@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import SearchMovies from './pages/SearchMovies';
 import SavedMovies from './pages/SavedMovies';
+import './App.scss';
 
 const client = new ApolloClient({
     request: operation => {

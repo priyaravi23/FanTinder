@@ -28,7 +28,7 @@ class SearchForm extends Component {
             <>
                 <Jumbotron fluid className='text-light search-jumbo'>
                     <Container>
-                        <h1>Keep Track of Movies Your Way.</h1>
+                        <h1>Track your favorite movies</h1>
                         <Form onSubmit={(event) => {this.props.handleFormSubmit(event, this.state.searchInput)}}>
                             <Form.Row>
                                 <Col xs={12} md={8}>
@@ -38,7 +38,7 @@ class SearchForm extends Component {
                                         onChange={(e) => this.setSearchInput(e.target.value)}
                                         type='text'
                                         size='lg'
-                                        placeholder='The Dark Knight'
+                                        placeholder='The Lord of the Rings'
                                     />
                                 </Col>
                                 <Col xs={12} md={4}>
