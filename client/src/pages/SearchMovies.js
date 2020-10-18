@@ -11,7 +11,6 @@ import SearchForm from '../components/SearchForm'
 const SearchMovies = () => {
     const [saveMovie, { error }] = useMutation(SAVE_MOVIE);
     const [searchedMovies, setSearchedMovies] = useState([]);
-    //const [searchInput, setSearchInput] = useState('');
     const [savedMovieIds, setSavedMovieIds] = useState(getSavedMovieIds());
 
     useEffect(() => {
@@ -45,18 +44,14 @@ const SearchMovies = () => {
             const movieData = filteredData.map((movie) => (
                 {
                     movieId: movie.id,
-                    vote: movie.vote_average, //|| ['No providers to display'],
+                    vote: movie.vote_average,
                     name: movie.title,
                     overview: movie.overview,
                     release: movie.release_date,
-                    // weight: movie.weight,
-                    // : movie.volumeInfo.imageLinks?.thumbnail || '',
-                    image: 'https://image.tmdb.org/t/p/w500' + movie.poster_path || '',
-                    // showingLink: movie.locations.url
+                    image: 'https://image.tmdb.org/t/p/w500' + movie.poster_path || ''
                 }));
 
             setSearchedMovies(movieData);
-            // setSearchInput('');
         } catch (err) {
             console.error(err);
         }
