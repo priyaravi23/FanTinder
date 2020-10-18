@@ -1,6 +1,6 @@
 ## FANTINDER
 
-*A MERN stack application, FANTINDER is an app that lets users search for & save movies to a library while connecting with others who share similar preferences*
+*A MERN stack application, FANTINDER is an app that lets users search for & save movies to a library while connecting with others who share matching preferences*
 
 ### Application Deployed to Heroku
 
@@ -12,9 +12,9 @@
 
 ```text
 AS A movie-lover stuck at home, 
-I WANT to search for & save movies/TV shows,
-purchace a movie / tv show using stripe payments,
-and connect with other users with similar preferences
+I WANT to search for & save movies,
+purchace movie/s using stripe payments,
+and connect with other users with matching preferences
 ```
 
 ### Acceptance Criteria
