@@ -50,6 +50,7 @@ export const deleteMovie = (movieId, token) => {
     });
 };
 
+// Using https://www.themoviedb.org/ for movies api
 export const searchTMDB = (query) => {
-    return fetch(`https://api.themoviedb.org/3/search/movie?api_key=24015e7692b811d33d1c989cbd42b043&query=${query}`)
+    return fetch(`https://api.themoviedb.org/3/search/movie?api_key=d64da0474db9594724886e71c0d202f1&query=${query}`)
 };

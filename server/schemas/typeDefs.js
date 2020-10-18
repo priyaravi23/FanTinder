@@ -1,43 +1,66 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
-  
-    type Book {
-        bookId: String
-        authors: [String]
-        description: String
-        title: String
+    type Movie {
+        movieId: Int
+        vote: Float
+        overview: String
+        name: String
         image: String
-        link: String
+        release: String
     }
     type User {
         _id: ID
         username: String
         email: String
-        bookCount: Int
-        savedBooks: [Book]
+        friendCount: Int
+        comments: [Comment]
+        friends: [User]
+        movieCount: Int
+        savedMovies: [Movie]
     }
   
-    input bookInput {
-        bookId: String
-        authors: [String]
-        description: String
-        title: String
+    input movieInput {
+        movieId: Int
+        vote: Float
+        overview: String
+        name: String
         image: String
-        link: String
+        release: String
     }
+    type Comment {
+        _id: ID
+        commentText: String
+        createdAt: String
+        username: String
+        reactionCount: Int
+        reactions: [Reaction]
+      }
+    type Reaction {
+        _id: ID
+        reactionBody: String
+        createdAt: String
+        username: String
+      }
     type Query {
         me: User
-    }
+        users: [User]
+        user(username: String!): User
+        comments(username: String): [Comment]
+        comment(_id: ID!): Comment
+      }
     type Auth {
-        token: ID
+        token: ID!
         user: User
     }
     type Mutation {
         login(email: String!, password: String!): Auth
         addUser(username: String!, email: String!, password: String!): Auth
-        saveBook(input: bookInput): User
-        removeBook(bookId: String!): User
+        addComment(commentText: String!): Comment
+        addReaction(commentId: ID!, reactionBody: String!): Comment
+        addFriend(friendId: ID!): User
+        saveMovie(input: movieInput): User
+        removeMovie(movieId: Int!): User
     }
 `;
 
