@@ -40,10 +40,15 @@ const SavedMovies = () => {
 
     return (
         <>
+            <Jumbotron fluid className='text-light bg-dark'>
+                <Container>
+                    <h1>Viewing saved movies!</h1>
+                </Container>
+            </Jumbotron>
             <Container>
-                <h2 className="results-heading saved-heading">
-                    {userData.movieCount
-                        ? `Viewing ${userData.movieCount} saved ${userData.movieCount === 1 ? 'movie' : 'movies'}:`
+                <h2>
+                    {userData.savedMovies.length
+                        ? `Viewing ${userData.savedMovies.length} saved ${userData.savedMovies.length === 1 ? 'movie' : 'movies'}:`
                         : 'You have no saved movies!'}
                 </h2>
                 <CardColumns>
