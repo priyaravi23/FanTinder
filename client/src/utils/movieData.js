@@ -1,4 +1,5 @@
 import { getVideos } from '../utils/API';
+import moment from 'moment';
 
 export const cleanMovieData = async (movieData) => {
     // filter out entries that won't display well
@@ -11,9 +12,10 @@ export const cleanMovieData = async (movieData) => {
         let cleanedData = {
             movieId: movie.id,
             vote: movie.vote_average,
+            vote_count: movie.vote_count,
             name: movie.title,
             overview: movie.overview,
-            release: movie.release_date,
+            release: moment(movie.release).format('LL'),
             image: 'https://image.tmdb.org/t/p/w500' + movie.poster_path
         }
 
