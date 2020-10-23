@@ -10,12 +10,12 @@ import Auth from '../utils/auth';
 const MovieCard = ({movie, savedMovieIds, displayTrailer, onClickHandler}) => {
   return (
     <Accordion>
-      <Card>
+      <Card key={movie.movieId}>
         {movie.trailer && displayTrailer
           ? <ResponsiveEmbed aspectRatio="16by9">
-              <iframe width="560" height="315" src={movie.trailer} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+              <iframe title={movie.movieId} width="560" height="315" src={movie.trailer} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
             </ResponsiveEmbed>
-          : <Card.Img src={movie.poster} alt={`The cover for ${movie.name}`} variant='top' />
+          : <Card.Img src={movie.image} alt={`The cover for ${movie.name}`} variant='top' />
         }
         <Card.Body>
           <Card.Title>{movie.name}</Card.Title>

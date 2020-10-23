@@ -14,7 +14,7 @@ export const cleanMovieData = async (movieData) => {
             name: movie.title,
             overview: movie.overview,
             release: movie.release_date,
-            poster: 'https://image.tmdb.org/t/p/w500' + movie.poster_path
+            image: 'https://image.tmdb.org/t/p/w500' + movie.poster_path
         }
 
         // try to get the trailer

@@ -8,6 +8,7 @@ const typeDefs = gql`
         name: String
         image: String
         release: String
+        trailer: String
     }
     type User {
         _id: ID
@@ -27,6 +28,7 @@ const typeDefs = gql`
         name: String
         image: String
         release: String
+        trailer: String
     }
     type Comment {
         _id: ID
