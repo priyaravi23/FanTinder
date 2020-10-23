@@ -4,10 +4,12 @@ const typeDefs = gql`
     type Movie {
         movieId: Int
         vote: Float
+        vote_count: Int
         overview: String
         name: String
         image: String
         release: String
+        trailer: String
     }
     type User {
         _id: ID
@@ -23,10 +25,12 @@ const typeDefs = gql`
     input movieInput {
         movieId: Int
         vote: Float
+        vote_count: Int
         overview: String
         name: String
         image: String
         release: String
+        trailer: String
     }
     type Comment {
         _id: ID

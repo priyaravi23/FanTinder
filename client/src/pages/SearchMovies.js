@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import Auth from '../utils/auth';
-import { Container, Button, Card, CardColumns } from 'react-bootstrap';
+
 import { searchTMDB } from '../utils/API';
-import { saveMovieIds, getSavedMovieIds } from '../utils/localStorage';
+import { cleanMovieData } from '../utils/movieData';
+import { saveMovieIds, getSavedMovieIds, removeMovieId } from '../utils/localStorage';
+
+// import GraphQL dependencies
 import { SAVE_MOVIE } from '../utils/mutations';
+import { REMOVE_MOVIE } from '../utils/mutations';
 import { useMutation } from '@apollo/react-hooks';
+
+// import react-bootstrap components
+import { Container, CardColumns } from 'react-bootstrap';
+
+// import custom components
 import Homepage from '../components/HomePage';
 import SearchForm from '../components/SearchForm'
+import MovieCard from '../components/MovieCard'
 
+// define SearchMovies component
 const SearchMovies = () => {
-    const [saveMovie, { error }] = useMutation(SAVE_MOVIE);
+    const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
     const [searchedMovies, setSearchedMovies] = useState([]);
     const [savedMovieIds, setSavedMovieIds] = useState(getSavedMovieIds());
+    const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
 
     useEffect(() => {
         return () => saveMovieIds(savedMovieIds);
@@ -26,30 +38,14 @@ const SearchMovies = () => {
 
         try {
             const response = await searchTMDB(searchInput);
-
+            
             if (!response.ok) {
-                throw new Error('Something went wrong!');
+                throw new Error('Something went wrong with the search!');
             }
 
             const { results } = await response.json();
 
-            const filteredData = results.filter((movie) => {
-                if (movie.poster_path) {
-                    return movie;
-                }
-            });
-
-            console.log(filteredData);
-
-            const movieData = filteredData.map((movie) => (
-                {
-                    movieId: movie.id,
-                    vote: movie.vote_average,
-                    name: movie.title,
-                    overview: movie.overview,
-                    release: movie.release_date,
-                    image: 'https://image.tmdb.org/t/p/w500' + movie.poster_path || ''
-                }));
+            const movieData = await cleanMovieData(results);
 
             setSearchedMovies(movieData);
         } catch (err) {
@@ -60,22 +56,38 @@ const SearchMovies = () => {
     const handleSaveMovie = async (movieId) => {
         const movieToSave = searchedMovies.find((movie) => movie.movieId === movieId);
 
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-            return false;
-        }
-
         try {
             const { data } = await saveMovie({
                 variables: { input: movieToSave }
             });
 
-            if (error) {
+            if (saveError) {
                 throw new Error('Something went wrong!');
             }
 
+            // update state, which also updates LocalStorage
             setSavedMovieIds([...savedMovieIds, movieToSave.movieId]);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleRemoveMovie = async (movieIdToRemove) => {
+        try {
+            const { data } = await removeMovie({
+                variables: { movieId: movieIdToRemove }
+            });
+
+            if (removeError) {
+                throw new Error('Something went wrong!');
+            }
+
+            // remove from LocalStorage
+            removeMovieId(movieIdToRemove);
+
+            // update state
+            const updatedSavedMovies = await savedMovieIds.filter(movieId => movieId != movieIdToRemove)
+            setSavedMovieIds(updatedSavedMovies);
         } catch (err) {
             console.error(err);
         }
@@ -94,31 +106,15 @@ const SearchMovies = () => {
                 <CardColumns>
                     {searchedMovies.map((movie) => {
                         return (
-                            <Card key={movie.movieId}>
-                                {movie.image ? (
-                                    <Card.Img src={movie.image} alt={`The cover for ${movie.name}`} variant='top' />
-                                ) : null}
-                                <Card.Body>
-                                    <Card.Title>{movie.name}</Card.Title>
-                                    <p className='small'>Rating: {movie.vote} </p>
-                                    <p className='small'>Release Date: {movie.release} </p>
-                                    <div className="scrollbar overflow-auto movie-description">
-                                        <p className='small card-text'>Overview: {movie.overview} </p>
-                                    </div>
-                                    <Card.Text>{movie.description}</Card.Text>
-                                    {Auth.loggedIn() && (
-                                        <Button
-                                            disabled={savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId)}
-                                            className='btn-block btn-info'
-                                            onClick={() => handleSaveMovie(movie.movieId)}>
-                                            {savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId)
-                                                ? 'Saved!'
-                                                : 'Save this Movie!'}
-                                        </Button>
-                                    )}
-                                </Card.Body>
-                            </Card>
-                        );
+                            <MovieCard
+                                displayTrailer
+                                movie={movie}
+                                saveHandler={handleSaveMovie}
+                                removeHandler={handleRemoveMovie}
+                                savedMovieIds={savedMovieIds}
+                                saveBtn
+                                deleteBtn />
+                        )
                     })}
                 </CardColumns>
             </Container>
