@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Auth from '../utils/auth';
 
+// import TMDB API dependencies
 import { searchTMDB } from '../utils/API';
 import { cleanMovieData } from '../utils/movieData';
+
+// import localStorage dependencies
 import { saveMovieIds, getSavedMovieIds, removeMovieId } from '../utils/localStorage';
 
 // import GraphQL dependencies
@@ -11,10 +13,9 @@ import { REMOVE_MOVIE } from '../utils/mutations';
 import { useMutation } from '@apollo/react-hooks';
 
 // import react-bootstrap components
-import { Container, CardColumns } from 'react-bootstrap';
+import { Container, CardColumns, Jumbotron } from 'react-bootstrap';
 
 // import custom components
-import Homepage from '../components/HomePage';
 import SearchForm from '../components/SearchForm'
 import MovieCard from '../components/MovieCard'
 
@@ -61,6 +62,8 @@ const SearchMovies = () => {
                 variables: { input: movieToSave }
             });
 
+            console.log({data});
+
             if (saveError) {
                 throw new Error('Something went wrong!');
             }
@@ -78,6 +81,8 @@ const SearchMovies = () => {
                 variables: { movieId: movieIdToRemove }
             });
 
+            console.log({data});
+
             if (removeError) {
                 throw new Error('Something went wrong!');
             }
@@ -86,7 +91,7 @@ const SearchMovies = () => {
             removeMovieId(movieIdToRemove);
 
             // update state
-            const updatedSavedMovies = await savedMovieIds.filter(movieId => movieId != movieIdToRemove)
+            const updatedSavedMovies = await savedMovieIds.filter(movieId => movieId !== movieIdToRemove)
             setSavedMovieIds(updatedSavedMovies);
         } catch (err) {
             console.error(err);
@@ -95,8 +100,11 @@ const SearchMovies = () => {
 
     return (
         <>
-            {!searchedMovies.length && <Homepage handleFormSubmit={handleFormSubmit} />}
-            {searchedMovies.length && <SearchForm handleFormSubmit={handleFormSubmit} />}
+            <Jumbotron fluid className='text-light search-jumbo'>
+                <Container>
+                    <SearchForm handleFormSubmit={handleFormSubmit} />
+                </Container>
+            </Jumbotron>
 
             <Container>
                 <h2 className="results-heading">

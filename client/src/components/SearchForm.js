@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Jumbotron, Container, Col, Form, Button } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 
 class SearchForm extends Component {
     constructor(props) {
@@ -22,35 +22,22 @@ class SearchForm extends Component {
     }
 
     render() {
-
-
         return (
-            <>
-                <Jumbotron fluid className='text-light search-jumbo'>
-                    <Container>
-                        <h1>Track your favorite movies</h1>
-                        <Form onSubmit={(event) => {this.props.handleFormSubmit(event, this.state.searchInput)}}>
-                            <Form.Row>
-                                <Col xs={12} md={8}>
-                                    <Form.Control
-                                        name='searchInput'
-                                        value={this.state.searchInput}
-                                        onChange={(e) => this.setSearchInput(e.target.value)}
-                                        type='text'
-                                        size='lg'
-                                        placeholder='The Lord of the Rings'
-                                    />
-                                </Col>
-                                <Col xs={12} md={4}>
-                                    <Button type='submit'  size='lg' >
-                                        Submit Search
-                                    </Button>
-                                </Col>
-                            </Form.Row>
-                        </Form>
-                    </Container>
-                </Jumbotron>
-            </>
+            <Form onSubmit={(event) => {this.props.handleFormSubmit(event, this.state.searchInput)}}>
+                <Form.Group>
+                    <Form.Label className="h3">Find your favorite movies</Form.Label>
+                    <Form.Control
+                        name='searchInput'
+                        value={this.state.searchInput}
+                        onChange={(e) => this.setSearchInput(e.target.value)}
+                        type='text'
+                        placeholder='The Lord of the Rings'
+                    />
+                </Form.Group>
+                <Button type='submit'>
+                    Search
+                </Button>
+            </Form>
         )
     }
 }
