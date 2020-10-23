@@ -3,10 +3,11 @@ import Auth from '../utils/auth';
 
 import { searchTMDB } from '../utils/API';
 import { cleanMovieData } from '../utils/movieData';
-import { saveMovieIds, getSavedMovieIds } from '../utils/localStorage';
+import { saveMovieIds, getSavedMovieIds, removeMovieId } from '../utils/localStorage';
 
 // import GraphQL dependencies
 import { SAVE_MOVIE } from '../utils/mutations';
+import { REMOVE_MOVIE } from '../utils/mutations';
 import { useMutation } from '@apollo/react-hooks';
 
 // import react-bootstrap components
@@ -19,9 +20,10 @@ import MovieCard from '../components/MovieCard'
 
 // define SearchMovies component
 const SearchMovies = () => {
-    const [saveMovie, { error }] = useMutation(SAVE_MOVIE);
+    const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
     const [searchedMovies, setSearchedMovies] = useState([]);
     const [savedMovieIds, setSavedMovieIds] = useState(getSavedMovieIds());
+    const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
 
     useEffect(() => {
         return () => saveMovieIds(savedMovieIds);
@@ -54,22 +56,38 @@ const SearchMovies = () => {
     const handleSaveMovie = async (movieId) => {
         const movieToSave = searchedMovies.find((movie) => movie.movieId === movieId);
 
-        const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-        if (!token) {
-            return false;
-        }
-
         try {
             const { data } = await saveMovie({
                 variables: { input: movieToSave }
             });
 
-            if (error) {
+            if (saveError) {
                 throw new Error('Something went wrong!');
             }
 
+            // update state, which also updates LocalStorage
             setSavedMovieIds([...savedMovieIds, movieToSave.movieId]);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleRemoveMovie = async (movieIdToRemove) => {
+        try {
+            const { data } = await removeMovie({
+                variables: { movieId: movieIdToRemove }
+            });
+
+            if (removeError) {
+                throw new Error('Something went wrong!');
+            }
+
+            // remove from LocalStorage
+            removeMovieId(movieIdToRemove);
+
+            // update state
+            const updatedSavedMovies = await savedMovieIds.filter(movieId => movieId != movieIdToRemove)
+            setSavedMovieIds(updatedSavedMovies);
         } catch (err) {
             console.error(err);
         }
@@ -91,8 +109,11 @@ const SearchMovies = () => {
                             <MovieCard
                                 displayTrailer
                                 movie={movie}
-                                onClickHandler={handleSaveMovie}
-                                savedMovieIds={savedMovieIds}/>
+                                saveHandler={handleSaveMovie}
+                                removeHandler={handleRemoveMovie}
+                                savedMovieIds={savedMovieIds}
+                                saveBtn
+                                deleteBtn />
                         )
                     })}
                 </CardColumns>
