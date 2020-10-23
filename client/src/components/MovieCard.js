@@ -69,7 +69,7 @@ const MovieCard = (props) => {
                             className="movie-card-button"
                             disabled={savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId)}
                             variant={savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId) ? "outline-secondary" : "outline-success" }
-                            onClick={() => saveHandler(movie.movieId)}>
+                            onClick={() => saveHandler(movie)}>
                             <i className='far fa-thumbs-up fa-2x' />
                         </Button>
                         }

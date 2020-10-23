@@ -54,15 +54,12 @@ const SearchMovies = () => {
         }
     };
 
-    const handleSaveMovie = async (movieId) => {
-        const movieToSave = searchedMovies.find((movie) => movie.movieId === movieId);
 
+    const handleSaveMovie = async (movieToSave) => {
         try {
             const { data } = await saveMovie({
                 variables: { input: movieToSave }
             });
-
-            console.log({data});
 
             if (saveError) {
                 throw new Error('Something went wrong!');
@@ -80,8 +77,6 @@ const SearchMovies = () => {
             const { data } = await removeMovie({
                 variables: { movieId: movieIdToRemove }
             });
-
-            console.log({data});
 
             if (removeError) {
                 throw new Error('Something went wrong!');
