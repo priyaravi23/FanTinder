@@ -8,6 +8,9 @@ import Navbar from './components/Navbar';
 import SearchMovies from './pages/SearchMovies';
 import SavedMovies from './pages/SavedMovies';
 
+// import GlobalState Provider
+import { FantinderProvider } from "./utils/GlobalState";
+
 // stylesheets
 import './App.scss';
 
@@ -28,14 +31,14 @@ function App() {
     return (
         <ApolloProvider client={client}>
             <Router>
-                <>
+                <FantinderProvider>
                     <Navbar />
                     <Switch>
                         <Route exact path='/' component={SearchMovies} />
                         <Route exact path='/saved' component={SavedMovies} />
                         <Route render={() => <h1 className='display-2'>Wrong page!</h1>} />
                     </Switch>
-                </>
+                </FantinderProvider>
             </Router>
         </ApolloProvider>
     );
