@@ -13,9 +13,11 @@ export const ADD_USER = gql`
                     movieId
                     name
                     vote
+                    vote_count
                     overview
                     image
                     release
+                    trailer
                 }
             }
         }
@@ -35,9 +37,11 @@ export const LOGIN_USER = gql`
                     movieId
                     name
                     vote
+                    vote_count
                     overview
                     image
                     release
+                    trailer
                 }
             }
         }
@@ -50,13 +54,16 @@ export const SAVE_MOVIE = gql`
             _id
             username
             email
+            movieCount
             savedMovies {
                 movieId
                 name
                 vote
+                vote_count
                 overview
                 image
                 release
+                trailer
             }
         }
     }
@@ -73,9 +80,11 @@ export const REMOVE_MOVIE = gql`
                 movieId
                 name
                 vote
+                vote_count
                 overview
                 image
                 release
+                trailer
             }
         }
     }
