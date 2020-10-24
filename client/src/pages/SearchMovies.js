@@ -13,15 +13,15 @@ import { REMOVE_MOVIE } from '../utils/mutations';
 import { useMutation } from '@apollo/react-hooks';
 
 // import react-bootstrap components
-import { Container, CardColumns, Jumbotron } from 'react-bootstrap';
+import { Form, Button, Container, CardColumns, Jumbotron } from 'react-bootstrap';
 
 // import custom components
-import SearchForm from '../components/SearchForm'
 import MovieCard from '../components/MovieCard'
 
 // define SearchMovies component
 const SearchMovies = () => {
     const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
+    const [searchInput, setSearchInput] = useState('');
     const [searchedMovies, setSearchedMovies] = useState([]);
     const [savedMovieIds, setSavedMovieIds] = useState(getSavedMovieIds());
     const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
@@ -30,7 +30,7 @@ const SearchMovies = () => {
         return () => saveMovieIds(savedMovieIds);
     });
 
-    const handleFormSubmit = async (event, searchInput) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
 
         if (!searchInput) {
@@ -53,7 +53,6 @@ const SearchMovies = () => {
             console.error(err);
         }
     };
-
 
     const handleSaveMovie = async (movieToSave) => {
         try {
@@ -97,7 +96,21 @@ const SearchMovies = () => {
         <>
             <Jumbotron fluid className='text-light search-jumbo'>
                 <Container>
-                    <SearchForm handleFormSubmit={handleFormSubmit} />
+                    <Form onSubmit={(event) => handleFormSubmit(event, searchInput)}>
+                        <Form.Group>
+                            <Form.Label className="h3">Find your favorite movies</Form.Label>
+                            <Form.Control
+                                name='searchInput'
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                type='text'
+                                placeholder='The Lord of the Rings'
+                            />
+                        </Form.Group>
+                        <Button type='submit'>
+                            Search
+                        </Button>
+                    </Form>
                 </Container>
             </Jumbotron>
 
