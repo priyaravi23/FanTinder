@@ -2,7 +2,8 @@ import { useReducer } from 'react';
 
 import {
     ADD_TO_SAVED_MOVIES,
-    REMOVE_FROM_SAVED_MOVIES
+    REMOVE_FROM_SAVED_MOVIES,
+    UPDATE_SAVED_MOVIES
 } from "./actions";
 
 export const reducer = (state, action) => {
@@ -36,6 +37,11 @@ export const reducer = (state, action) => {
                 ...state,
                 savedMovies: removeMovieState
             };
+        case UPDATE_SAVED_MOVIES:
+            return {
+                ...state,
+                savedMovies: action.savedMovies
+            }
         default:
             return state ? state : '';
     }

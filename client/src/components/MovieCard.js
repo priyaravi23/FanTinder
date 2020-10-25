@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // import bootstrap-react components
 import { Accordion, Button, Card, ResponsiveEmbed } from 'react-bootstrap';
@@ -7,17 +7,44 @@ import StarRatings from 'react-star-ratings';
 // import utils
 import Auth from '../utils/auth';
 
-// define component
+// import GraphQL Dependencies
+import { SAVE_MOVIE, REMOVE_MOVIE } from '../utils/mutations';
+import { useMutation } from '@apollo/react-hooks';
+
+// import GlobalState dependencies
+import { useFantinderContext } from "../utils/GlobalState";
+import { ADD_TO_SAVED_MOVIES, REMOVE_FROM_SAVED_MOVIES } from '../utils/actions';
+
 const MovieCard = (props) => {
     const {
         movie,
-        savedMovieIds,
         displayTrailer,
-        removeHandler,
-        saveHandler,
         deleteBtn,
         saveBtn
     } = props;
+
+    // set up global state
+    const [state, dispatch] = useFantinderContext();
+    const { savedMovies } = state;
+    const savedMovieIds = savedMovies?.map(movie => movie.movieId)
+
+    // update the db
+    const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
+    const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
+
+    const handleSaveMovie = async (movie) => {
+        dispatch({
+            type: ADD_TO_SAVED_MOVIES,
+            movieToSave: movie
+        });
+    };
+
+    const handleRemoveMovie = async (movieId) => {
+        dispatch({
+            type: REMOVE_FROM_SAVED_MOVIES,
+            movieId: movieId
+        });
+    };
 
     return (
         <Accordion>
@@ -40,7 +67,7 @@ const MovieCard = (props) => {
                       starSpacing="1px"
                     />
                     <Card.Text className='small'>
-                      ({movie.vote_count.toLocaleString()} ratings)
+                      {/* ({movie} ratings) */}
                     </Card.Text>
                     <Accordion.Toggle className="small" as={Card.Link} variant="link" eventKey={movie.movieId}>
                     Click to expand for more details
@@ -56,20 +83,20 @@ const MovieCard = (props) => {
 
                 {Auth.loggedIn() &&
                     <Card.Footer className="d-flex justify-content-between">
-                        {deleteBtn && 
+                       {deleteBtn && 
                         <Button
                             className="movie-card-button"
                             variant="outline-danger"
-                            onClick={() => removeHandler(movie.movieId)}>
+                            onClick={() => handleRemoveMovie(movie.movieId)}>
                             <i className='far fa-thumbs-down fa-2x' />
                         </Button>
                         }
                         {saveBtn && 
                         <Button
                             className="movie-card-button"
-                            disabled={savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId)}
-                            variant={savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId) ? "outline-secondary" : "outline-success" }
-                            onClick={() => saveHandler(movie)}>
+                            disabled={savedMovieIds?.some((savedMovie) => savedMovie.movieId === movie.movieId)}
+                            variant={savedMovieIds?.some((savedMovie) => savedMovie.movieId === movie.movieId) ? "outline-secondary" : "outline-success" }
+                            onClick={() => handleSaveMovie(movie)}>
                             <i className='far fa-thumbs-up fa-2x' />
                         </Button>
                         }
