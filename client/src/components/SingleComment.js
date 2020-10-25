@@ -1,14 +1,14 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
-import { QUERY_THOUGHT } from '../utils/queries';
+import { QUERY_COMMENT } from '../utils/queries';
 import ReactionList from '../components/ReactionList';
 import ReactionForm from '../components/ReactionForm';
 import Auth from '../utils/auth';
 
 const SingleComment = props => {
   const { id: commentId } = useParams();
-  const { loading, data } = useQuery(QUERY_THOUGHT, {
+  const { loading, data } = useQuery(QUERY_COMMENT, {
     variables: { id: commentId }
   });
 

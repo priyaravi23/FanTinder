@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
-import { ADD_THOUGHT } from '../../utils/mutations';
-import { QUERY_THOUGHTS, QUERY_ME } from '../../utils/queries';
+import { ADD_COMMENT } from '../../utils/mutations';
+import { QUERY_COMMENTS, QUERY_ME } from '../../utils/queries';
 
 const CommentForm = () => {
 
   const [commentText, setText] = useState('');
   const [characterCount, setCharacterCount] = useState(0);
   // error is initially underfined but can change if mutation fails
-  const [addComment, { error }] = useMutation(ADD_THOUGHT, {
+  const [addComment, { error }] = useMutation(ADD_COMMENT, {
     update(cache, { data: { addComment } }) {
       try {
         // could potentially not exist yet, so wrap in a try...catch
-        const { comments } = cache.readQuery({ query: QUERY_THOUGHTS });
+        const { comments } = cache.readQuery({ query: QUERY_COMMENTS });
         cache.writeQuery({
-          query: QUERY_THOUGHTS,
+          query: QUERY_COMMENTS,
           data: { comments: [addComment, ...comments] }
         });
       } catch (e) {
