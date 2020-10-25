@@ -1,6 +1,7 @@
 // import our actions
 import {
-    UPDATE_SAVED_MOVIES
+    ADD_TO_SAVED_MOVIES,
+    REMOVE_FROM_SAVED_MOVIES
 } from '../utils/actions';
 
 // import reducer
@@ -12,7 +13,7 @@ const initialState = {
         {
             "movieId": 1,
             "vote": 9.0,
-            "vote_count": 111,
+            "voteCount": 111,
             "overview": "This is Grumpy Cat's movie",
             "name": "Grumpy Cat",
             "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg/220px-Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg",
@@ -22,7 +23,7 @@ const initialState = {
         {
             "movieId": 2,
             "vote": 7.0,
-            "vote_count": 222,
+            "voteCount": 222,
             "overview": "This is Grumpy Cat's Second Movie",
             "name": "Grumpy Cat: The Sequel",
             "image": "https://ichef.bbci.co.uk/news/400/cpsprodpb/26AC/production/_107000990_grumpycat5.jpg",
@@ -32,13 +33,32 @@ const initialState = {
     ]
 };
 
-
-test('UPDATE_SAVED_MOVIES', () => {
+test('ADD_TO_SAVED_MOVIES', () => {
     let newState = reducer(initialState, {
-        type: UPDATE_SAVED_MOVIES,
-        savedMovies: [{}]
+        type: ADD_TO_SAVED_MOVIES,
+        savedMovies: {
+            "movieId": 3,
+            "vote": 2.0,
+            "voteCount": 333,
+            "overview": "This is Grumpy Cat's Third Movie",
+            "name": "Grumpy Cat Returns",
+            "image": "https://assets3.thrillist.com/v1/image/2824030/414x310/crop;jpeg_quality=65.jpg",
+            "release": "2020-10-31",
+            "trailer": "https://www.youtube.com/watch?v=DhjLBmZqJKU"
+        }
     });
 
-    expect(newState.savedMovies.length).toBe(1);
+    expect(initialState.savedMovies.length).toBe(2);
+    expect(newState.savedMovies.length).toBe(3);
+});
+
+test('REMOVE_SAVED_MOVIE', () => {
+    let newState = reducer(initialState, {
+        type: REMOVE_FROM_SAVED_MOVIES,
+        movieId: 1
+    });
+
+    expect(newState.savedMovies[0].movieId).toBe(2);  // expect the first index to be the movie with movieId = 1
+    expect(newState.savedMovies.length).toBe(1);  // expect the first index to be 
     expect(initialState.savedMovies.length).toBe(2);
 });
