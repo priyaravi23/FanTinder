@@ -13,7 +13,7 @@ import { useMutation } from '@apollo/react-hooks';
 
 // import GlobalState dependencies
 import { useFantinderContext } from "../utils/GlobalState";
-import { ADD_TO_SAVED_MOVIES, REMOVE_FROM_SAVED_MOVIES } from '../utils/actions';
+import { ADD_TO_SAVED_MOVIES, REMOVE_FROM_SAVED_MOVIES, UPDATE_SAVED_MOVIES } from '../utils/actions';
 
 const MovieCard = (props) => {
     const {
@@ -26,24 +26,59 @@ const MovieCard = (props) => {
     // set up global state
     const [state, dispatch] = useFantinderContext();
     const { savedMovies } = state;
-    const savedMovieIds = savedMovies?.map(movie => movie.movieId)
 
     // update the db
     const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
     const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
 
     const handleSaveMovie = async (movie) => {
-        dispatch({
-            type: ADD_TO_SAVED_MOVIES,
-            movieToSave: movie
-        });
+        try {
+            // update the db
+            const { data } = await saveMovie({
+                variables: { input: movie }
+            });
+
+            // get savedMovies from the updated User
+            const { saveMovie: saveMovieData } = data;
+            const { savedMovies: updatedSavedMovies } = saveMovieData;
+
+            if (saveError) {
+                throw new Error('Something went wrong!');
+            }
+
+            // update global state
+            dispatch({
+                type: UPDATE_SAVED_MOVIES,
+                savedMovies: updatedSavedMovies
+            });
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleRemoveMovie = async (movieId) => {
-        dispatch({
-            type: REMOVE_FROM_SAVED_MOVIES,
-            movieId: movieId
-        });
+        try {
+            // update the db
+            const { data } = await removeMovie({
+                variables: { movieId }
+            });
+
+            // get savedMovies from the updated User
+            const { removeMovie: saveMovieData } = data;
+            const { savedMovies: updatedSavedMovies } = saveMovieData;
+
+            if (removeError) {
+                throw new Error('Something went wrong!');
+            }
+
+            // update global state
+            dispatch({
+                type: UPDATE_SAVED_MOVIES,
+                savedMovies: updatedSavedMovies
+            });
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
@@ -94,8 +129,8 @@ const MovieCard = (props) => {
                         {saveBtn && 
                         <Button
                             className="movie-card-button"
-                            disabled={savedMovieIds?.some((savedMovie) => savedMovie.movieId === movie.movieId)}
-                            variant={savedMovieIds?.some((savedMovie) => savedMovie.movieId === movie.movieId) ? "outline-secondary" : "outline-success" }
+                            disabled={savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId)}
+                            variant={savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId) ? "outline-secondary" : "outline-success" }
                             onClick={() => handleSaveMovie(movie)}>
                             <i className='far fa-thumbs-up fa-2x' />
                         </Button>
