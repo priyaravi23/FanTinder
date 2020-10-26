@@ -57,30 +57,29 @@ const MovieCards = (props) => {
 
             // get savedMovies from the updated User
             const { saveMovie: saveMovieData } = data;
-
-            console.log({ saveMovieData })
             const { savedMovies: updatedSavedMovies } = saveMovieData;
 
             if (saveError) {
                 throw new Error('Something went wrong!');
             }
 
-
             // update global state
             dispatch({
                 type: UPDATE_SAVED_MOVIES,
                 savedMovies: updatedSavedMovies
             });
+
+            idbPromise('savedMovies', 'put', { ...movie });
         } catch (err) {
             console.error(err);
         }
     };
 
-    const handleRemoveMovie = async (movieId) => {
+    const handleRemoveMovie = async (movie) => {
         try {
             // update the db
             const { data } = await removeMovie({
-                variables: { movieId }
+                variables: { movieId: movie.movieId }
             });
 
             // get savedMovies from the updated User
@@ -96,6 +95,8 @@ const MovieCards = (props) => {
                 type: UPDATE_SAVED_MOVIES,
                 savedMovies: updatedSavedMovies
             });
+
+            idbPromise('savedMovies', 'delete', { ...movie });
         } catch (err) {
             console.error(err);
         }

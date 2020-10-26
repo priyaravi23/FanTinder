@@ -57,7 +57,7 @@ const SingleMovieCard = (props) => {
                         <Button
                             className="movie-card-button"
                             variant="outline-danger"
-                            onClick={() => removeMovieHandler(movie.movieId)}>
+                            onClick={() => removeMovieHandler(movie)}>
                             <i className='far fa-thumbs-down fa-2x' />
                         </Button>
                         <Button
