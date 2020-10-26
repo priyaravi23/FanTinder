@@ -15,25 +15,39 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useFantinderContext } from "../utils/GlobalState";
 import { UPDATE_SAVED_MOVIES } from '../utils/actions';
 
+// import indexedDB dependencies
+import { idbPromise } from "../utils/helpers";
+
 const MovieCards = (props) => {
     const [state, dispatch] = useFantinderContext();
     const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
     const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
-
     const { moviesToDisplay , displayTrailers } = props;
 
     useEffect(() => {
-        // if there's data to be stored
-        if (data) {
-          // let's store it in the global state object
-          dispatch({
-            type: UPDATE_SAVED_MOVIES,
-            savedMovies: data.me.savedMovies
-          });
+        if(data) {
+            dispatch({
+                type: UPDATE_SAVED_MOVIES,
+                savedMovies: data.me.savedMovies
+            })
+    
+        data.me.savedMovies.forEach((movie) => {
+            idbPromise('savedMovies', 'put', movie);
+        });
+        // add else if to check if `loading` is undefined in `useQuery()` Hook
+        } else if (!loading) {
+        // since we're offline, get all of the data from the `savedMovies` store
+        idbPromise('savedMovies', 'get').then((savedMovies) => {
+            // use retrieved data to set global state for offline browsing
+            dispatch({
+                type: UPDATE_SAVED_MOVIES,
+                savedMovies: savedMovies
+            });
+        });
         }
     }, [data, loading, dispatch]);
-    
+
     const handleSaveMovie = async (movie) => {
         try {
             // update the db
