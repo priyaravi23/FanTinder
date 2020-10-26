@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Auth from '../utils/auth';
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, Container, Modal, Tab } from 'react-bootstrap';
+import { Navbar, Nav, Modal, Tab } from 'react-bootstrap';
 import SignUpForm from './SignupForm';
 import LoginForm from './LoginForm';
 
@@ -11,31 +11,33 @@ const AppNavbar = () => {
 
     return (
         <>
-            <Navbar bg='transparent' variant='dark' expand='lg' fixed="top">
-                <Container fluid>
-                    <Navbar.Brand as={Link} to='/'>
-                        FANTINDER
-                    </Navbar.Brand>
-                    <Navbar.Toggle aria-controls='navbar' />
-                    <Navbar.Collapse id='navbar'>
-                        <Nav className='ml-auto'>
-                            <Nav.Link as={Link} to='/'>
-                                Search For Movies
+            <Navbar collapseOnSelect expand="lg" variant="dark">
+                <Navbar.Brand as={Link} to='/'>
+                    FANTINDER
+                </Navbar.Brand>
+                <Navbar.Toggle aria-controls='navbar' />
+                <Navbar.Collapse id='navbar'>
+                    <Nav className='ml-auto'>
+                        <Nav.Link as={Link} to='/'>
+                            Search For Movies
+                        </Nav.Link>
+                        {/* if user is logged in show saved movies and logout */}
+                        {Auth.loggedIn() ? (
+                            <>
+                                <Nav.Link as={Link} to='/saved'>
+                                    Saved Movies
+                                </Nav.Link>
+                                <Nav.Link onClick={Auth.logout}>
+                                    Logout
+                                </Nav.Link>
+                            </>
+                        ) : (
+                            <Nav.Link onClick={() => setShowModal(true)}>
+                                Login/Sign Up
                             </Nav.Link>
-                            {/* if user is logged in show saved movies and logout */}
-                            {Auth.loggedIn() ? (
-                                <>
-                                    <Nav.Link as={Link} to='/saved'>
-                                        See Your Movies
-                                    </Nav.Link>
-                                    <Nav.Link onClick={Auth.logout}>Logout</Nav.Link>
-                                </>
-                            ) : (
-                                <Nav.Link onClick={() => setShowModal(true)}>Login/Sign Up</Nav.Link>
-                            )}
-                        </Nav>
-                    </Navbar.Collapse>
-                </Container>
+                        )}
+                    </Nav>
+                </Navbar.Collapse>
             </Navbar>
             {/* set modal data up */}
             <Modal

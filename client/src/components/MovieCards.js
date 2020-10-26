@@ -102,20 +102,24 @@ const MovieCards = (props) => {
         }
     };
 
-    return (<CardColumns>
-        {moviesToDisplay.map((movie) => {
-            return (
-                <SingleMovieCard
-                    displayTrailer={displayTrailers}
-                    movie={movie}
-                    saveMovieHandler={handleSaveMovie}
-                    removeMovieHandler={handleRemoveMovie}
-                    disabled={state.savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId)}
-                    btnColor={state.savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId) ? "outline-secondary" : "outline-success" }
-                    />
-            )
-        })}
-    </CardColumns>)
+    return (
+        <CardColumns>
+            {moviesToDisplay.map((movie) => {
+                return (
+                    <SingleMovieCard
+                        key={movie.movieId}
+                        displayTrailer={displayTrailers}
+                        movie={movie}
+                        saveMovieHandler={handleSaveMovie}
+                        removeMovieHandler={handleRemoveMovie}
+                        disabled={state.savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId)}
+                        btnColor={state.savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId) ? "outline-secondary" : "outline-success" }
+                        />
+                    )
+                })
+            }
+        </CardColumns>
+    )
 }
 
 export default MovieCards;

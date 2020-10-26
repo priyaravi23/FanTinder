@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 // import bootstrap-react components
 import { Accordion, Button, Card, ResponsiveEmbed } from 'react-bootstrap';
@@ -19,7 +19,7 @@ const SingleMovieCard = (props) => {
 
     return (
         <Accordion>
-            <Card key={movie.movieId}>
+            <Card>
                 {displayTrailer && movie.trailer
                     ? <ResponsiveEmbed aspectRatio="16by9">
                         <iframe title={movie.movieId} width="560" height="315" src={movie.trailer} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
@@ -38,7 +38,7 @@ const SingleMovieCard = (props) => {
                       starSpacing="1px"
                     />
                     <Card.Text className='small'>
-                      {/* ({movie} ratings) */}
+                      ({movie.voteCount?.toLocaleString()} ratings)
                     </Card.Text>
                     <Accordion.Toggle className="small" as={Card.Link} variant="link" eventKey={movie.movieId}>
                     Click to expand for more details

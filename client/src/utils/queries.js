@@ -33,7 +33,7 @@ export const GET_USER = gql`
               image
               release
               trailer
-              vote_count
+              voteCount
         }
     }
   }

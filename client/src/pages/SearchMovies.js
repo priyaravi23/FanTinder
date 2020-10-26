@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 // import TMDB API dependencies
 import { searchTMDB } from '../utils/API';
@@ -40,11 +40,11 @@ const SearchMovies = () => {
 
     return (
         <>
-            <Jumbotron fluid className='text-light search-jumbo'>
+            <Jumbotron fluid className='text-light bg-dark'>
                 <Container>
                     <Form onSubmit={(event) => handleFormSubmit(event, searchInput)}>
-                        <Form.Group>
-                            <Form.Label className="h3">Find your favorite movies</Form.Label>
+                        <Form.Label className="h3">Find your favorite movies</Form.Label>
+                        <Form.Group className="d-flex">
                             <Form.Control
                                 name='searchInput'
                                 value={searchInput}
@@ -52,10 +52,10 @@ const SearchMovies = () => {
                                 type='text'
                                 placeholder='The Lord of the Rings'
                             />
+                            <Button type='submit' className='ml-2'>
+                                Search
+                            </Button>
                         </Form.Group>
-                        <Button type='submit'>
-                            Search
-                        </Button>
                     </Form>
                 </Container>
             </Jumbotron>

@@ -12,7 +12,7 @@ export const cleanMovieData = async (movieData) => {
         let cleanedData = {
             movieId: movie.id,
             vote: movie.vote_average,
-            vote_count: movie.vote_count,
+            voteCount: movie.vote_count,
             name: movie.title,
             overview: movie.overview,
             release: moment(movie.release).format('LL'),
