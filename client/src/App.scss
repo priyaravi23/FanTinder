@@ -4,20 +4,13 @@ $color-light-text: rgb(207, 207, 207);
 $color-dark-text: rgb(63, 63, 63);
 
 body {
+  font-family: 'Rubik', sans-serif;
   background: $color-primary;
   color: $color-light-text;
 }
 
-.nav-bar {
+.navbar {
   color: $color-light-text;
-}
-
-.navbar-brand {
-  color: $color-light-text !important;
-}
-
-.nav-link {
-  color: $color-light-text !important;
 }
 
 .homepage {
@@ -39,12 +32,11 @@ body {
   text-align: center;
 }
 
-.search-jumbo {
-  padding-top: 90px;
-}
-
 .jumbotron {
-  background: $color-secondary;
+  height: 30vh;
+  display: flex;
+  align-items: center;
+  background-color: $color-secondary;
 }
 
 .search-btn {
@@ -60,6 +52,19 @@ body {
 
 .card-body {
   color: $color-dark-text;
+}
+
+.card-columns {
+  flex-direction: row;
+}
+
+.card-img-top {
+  max-height: 75vh;
+}
+
+.small {
+  font-weight: 300;
+  font-style: italic;
 }
 
 @media (min-width: 576px) {

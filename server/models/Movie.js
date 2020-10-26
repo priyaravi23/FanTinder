@@ -16,7 +16,13 @@ const movieSchema = new Schema(
         image: {
             type: String,
         },
+        trailer: {
+            type: String,
+        },
         vote: {
+            type: Number,
+        },
+        voteCount: {
             type: Number,
         },
         name: {

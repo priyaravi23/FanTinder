@@ -7,26 +7,24 @@ import StarRatings from 'react-star-ratings';
 // import utils
 import Auth from '../utils/auth';
 
-// define component
-const MovieCard = (props) => {
+const SingleMovieCard = (props) => {
     const {
         movie,
-        savedMovieIds,
         displayTrailer,
-        removeHandler,
-        saveHandler,
-        deleteBtn,
-        saveBtn
+        saveMovieHandler,
+        removeMovieHandler,
+        disabled,
+        btnColor
     } = props;
 
     return (
         <Accordion>
-            <Card key={movie.movieId}>
-                {movie.trailer && displayTrailer
+            <Card>
+                {displayTrailer && movie.trailer
                     ? <ResponsiveEmbed aspectRatio="16by9">
                         <iframe title={movie.movieId} width="560" height="315" src={movie.trailer} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                     </ResponsiveEmbed>
-                    : <Card.Img src={movie.image} alt={`The cover for ${movie.name}`} variant='top' />
+                    : (movie.image && <Card.Img src={movie.image} alt={`The cover for ${movie.name}`} variant='top' />)
                 }
                 <Card.Body>
                     <Card.Title>
@@ -40,7 +38,7 @@ const MovieCard = (props) => {
                       starSpacing="1px"
                     />
                     <Card.Text className='small'>
-                      ({movie.vote_count.toLocaleString()} ratings)
+                      ({movie.voteCount?.toLocaleString()} ratings)
                     </Card.Text>
                     <Accordion.Toggle className="small" as={Card.Link} variant="link" eventKey={movie.movieId}>
                     Click to expand for more details
@@ -56,23 +54,19 @@ const MovieCard = (props) => {
 
                 {Auth.loggedIn() &&
                     <Card.Footer className="d-flex justify-content-between">
-                        {deleteBtn && 
                         <Button
                             className="movie-card-button"
                             variant="outline-danger"
-                            onClick={() => removeHandler(movie.movieId)}>
+                            onClick={() => removeMovieHandler(movie)}>
                             <i className='far fa-thumbs-down fa-2x' />
                         </Button>
-                        }
-                        {saveBtn && 
                         <Button
                             className="movie-card-button"
-                            disabled={savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId)}
-                            variant={savedMovieIds?.some((savedMovieId) => savedMovieId === movie.movieId) ? "outline-secondary" : "outline-success" }
-                            onClick={() => saveHandler(movie)}>
+                            disabled={disabled}
+                            variant={btnColor}
+                            onClick={() => saveMovieHandler(movie)}>
                             <i className='far fa-thumbs-up fa-2x' />
                         </Button>
-                        }
                     </Card.Footer>
                 }
             </Card>
@@ -80,4 +74,4 @@ const MovieCard = (props) => {
     )
 }
 
-export default MovieCard;
+export default SingleMovieCard;

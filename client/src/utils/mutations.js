@@ -13,7 +13,7 @@ export const ADD_USER = gql`
                     movieId
                     name
                     vote
-                    vote_count
+                    voteCount
                     overview
                     image
                     release
@@ -37,7 +37,7 @@ export const LOGIN_USER = gql`
                     movieId
                     name
                     vote
-                    vote_count
+                    voteCount
                     overview
                     image
                     release
@@ -59,7 +59,7 @@ export const SAVE_MOVIE = gql`
                 movieId
                 name
                 vote
-                vote_count
+                voteCount
                 overview
                 image
                 release
@@ -80,7 +80,7 @@ export const REMOVE_MOVIE = gql`
                 movieId
                 name
                 vote
-                vote_count
+                voteCount
                 overview
                 image
                 release
