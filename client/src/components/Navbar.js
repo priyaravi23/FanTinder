@@ -11,7 +11,7 @@ const AppNavbar = () => {
 
     return (
         <>
-            <Navbar collapseOnSelect expand="lg" variant="dark">
+            <Navbar collapseOnSelect expand="lg" bg="black" variant="dark">
                 <Navbar.Brand as={Link} to='/'>
                     FANTINDER
                 </Navbar.Brand>

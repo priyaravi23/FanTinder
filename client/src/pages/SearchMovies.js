@@ -40,7 +40,7 @@ const SearchMovies = () => {
 
     return (
         <>
-            <Jumbotron fluid className='text-light bg-dark'>
+            <Jumbotron fluid className="text-light">
                 <Container>
                     <Form onSubmit={(event) => handleFormSubmit(event, searchInput)}>
                         <Form.Label className="h3">Find your favorite movies</Form.Label>
