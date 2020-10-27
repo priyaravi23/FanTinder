@@ -24,7 +24,7 @@ const userSchema = new Schema(
         // set savedMovies to be an array of data that adheres to the movieSchema
         savedMovies: [movieSchema],
         // set removedMovies to be an array of movieIds (strings) as defined by movieSchema
-        removedMovies: [Number]
+        removedMovies: [movieSchema],
     },
     // set this to use virtual below
     {

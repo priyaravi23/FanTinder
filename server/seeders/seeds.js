@@ -2,13 +2,11 @@
 const faker = require('faker');
 
 const db = require('../config/connection');
-const { Comment, User, Reaction, Movie } = require('../models');
+const { Comment, User } = require('../models');
 
 db.once('open', async () => {
   await Comment.remove({});
   await User.remove({});
-  await Reaction.remove({});
-  await Movie.remove({});
 
   // create user data
   const userData = [];
@@ -22,6 +20,51 @@ db.once('open', async () => {
   }
 
   const createdUsers = await User.collection.insert(userData);
+
+
+// create savedMovies
+    for (let i = 0; i < 100; i += 1) {
+      const movieId = faker.address.zipCode();
+      const release = faker.lorem.word();
+      const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
+      const image = faker.image.imageUrl();
+      //example//'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rplLJ2hPcOQmkFhTqUte0MkEaO2.jpg'
+      const vote = faker.random.number()*5;
+      const voteCount = faker.random.number()*5;
+      const name = faker.commerce.productName();
+      //example//"The Silence of the Lambs"
+      const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
+      const { username } = createdUsers.ops[randomUserIndex];
+      const { _id: userId } = createdUsers.ops[randomUserIndex];
+  
+      await User.updateOne(
+        { _id: userId },
+        { $push: { savedMovies: { movieId, release, overview, image, vote, voteCount, name, username } } },
+        { runValidators: true }
+      );
+    }
+
+// create removedMovies
+for (let i = 0; i < 100; i += 1) {
+  const movieId = faker.address.zipCode();
+  const release = faker.lorem.word();
+  const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
+  const image = faker.image.imageUrl();
+  //example//'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rplLJ2hPcOQmkFhTqUte0MkEaO2.jpg'
+  const vote = faker.random.number()*5;
+  const voteCount = faker.random.number()*5;
+  const name = faker.commerce.productName();
+  //example//"The Silence of the Lambs"
+  const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
+  const { username } = createdUsers.ops[randomUserIndex];
+  const { _id: userId } = createdUsers.ops[randomUserIndex];
+
+  await User.updateOne(
+    { _id: userId },
+    { $push: { removedMovies: { movieId, release, overview, image, vote, voteCount, name, username } } },
+    { runValidators: true }
+  );
+}
 
   // create friends
   for (let i = 0; i < 100; i += 1) {
@@ -71,27 +114,6 @@ db.once('open', async () => {
       { $push: { reactions: { reactionBody, username } } },
       { runValidators: true }
     );
-  }
-  // create Movies
-  let createdMovies = [];
-  for (let i = 0; i < 100; i += 1) {
-    const movieRelease = faker.lorem.word();
-    const movieOverview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
-    const movieImage = faker.image.imageUrl();
-    const movieVote = faker.random.number()*5;
-    const movieName = faker.commerce.productName();
-
-    const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
-    const { username, _id: userId } = createdUsers.ops[randomUserIndex];
-
-    const createdMovie = await Movie.create({ movieRelease, movieOverview, movieId, movieImage, movieVote, movieName, username });
-
-    const updatedUser = await User.updateOne(
-      { _id: userId },
-      { $push: { savedMovies: createdMovie._id } }
-    );
-
-    createdMovies.push(createdMovie);
   }
 
   console.log('all done!');

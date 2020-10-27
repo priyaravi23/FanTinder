@@ -9,8 +9,9 @@ const resolvers = {
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
                     .populate('comments')
-                    .populate('friends');
-
+                    .populate('friends')
+                    .populate('savedMovies')
+                    .populate('removedMovies');
                 return userData;
             }
 
@@ -33,7 +34,9 @@ const resolvers = {
             return User.find()
                 .select('-__v -password')
                 .populate('friends')
-                .populate('comments');
+                .populate('comments')
+                .populate('savedMovies')
+                .populate('removedMovies');
         },
 
         // get a user by username
@@ -41,7 +44,9 @@ const resolvers = {
             return User.findOne({ username })
                 .select('-__v -password')
                 .populate('friends')
-                .populate('comments');
+                .populate('comments')
+                .populate('savedMovies')
+                .populate('removedMovies');
         },
     },
 
