@@ -20,6 +20,7 @@ const typeDefs = gql`
         friends: [User]
         movieCount: Int
         savedMovies: [Movie]
+        removedMovies: [Int]
     }
   
     input movieInput {

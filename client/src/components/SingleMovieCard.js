@@ -10,9 +10,11 @@ import Auth from '../utils/auth';
 const SingleMovieCard = (props) => {
     const {
         movie,
+        displaySkipButton,
         displayTrailer,
         saveMovieHandler,
         removeMovieHandler,
+        skipMovieHandler,
         disabled,
         btnColor
     } = props;
@@ -52,14 +54,24 @@ const SingleMovieCard = (props) => {
                     </Accordion.Collapse>
                 </Card.Body>
 
-                {Auth.loggedIn() &&
-                    <Card.Footer className="d-flex justify-content-between">
+                <Card.Footer className="d-flex justify-content-around">
+                    {Auth.loggedIn() &&
                         <Button
                             className="movie-card-button"
                             variant="outline-danger"
                             onClick={() => removeMovieHandler(movie)}>
                             <i className='far fa-thumbs-down fa-2x' />
                         </Button>
+                    }
+                    {displaySkipButton &&
+                        <Button
+                            className="movie-card-button"
+                            variant="outline-info"
+                            onClick={() => skipMovieHandler()}>
+                            {Auth.loggedIn() ? <>Skip This Movie</> : <>Next Movie</>}
+                        </Button>
+                    }
+                    {Auth.loggedIn() &&
                         <Button
                             className="movie-card-button"
                             disabled={disabled}
@@ -67,8 +79,8 @@ const SingleMovieCard = (props) => {
                             onClick={() => saveMovieHandler(movie)}>
                             <i className='far fa-thumbs-up fa-2x' />
                         </Button>
+                    }
                     </Card.Footer>
-                }
             </Card>
         </Accordion>
     )

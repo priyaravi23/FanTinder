@@ -32,19 +32,19 @@ const MovieCards = (props) => {
                 savedMovies: data.me.savedMovies
             })
     
-        data.me.savedMovies.forEach((movie) => {
-            idbPromise('savedMovies', 'put', movie);
-        });
+            data.me.savedMovies.forEach((movie) => {
+                idbPromise('savedMovies', 'put', movie);
+            });
         // add else if to check if `loading` is undefined in `useQuery()` Hook
         } else if (!loading) {
-        // since we're offline, get all of the data from the `savedMovies` store
-        idbPromise('savedMovies', 'get').then((savedMovies) => {
-            // use retrieved data to set global state for offline browsing
-            dispatch({
-                type: UPDATE_SAVED_MOVIES,
-                savedMovies: savedMovies
+            // since we're offline, get all of the data from the `savedMovies` store
+            idbPromise('savedMovies', 'get').then((savedMovies) => {
+                // use retrieved data to set global state for offline browsing
+                dispatch({
+                    type: UPDATE_SAVED_MOVIES,
+                    savedMovies: savedMovies
+                });
             });
-        });
         }
     }, [data, loading, dispatch]);
 
@@ -104,7 +104,7 @@ const MovieCards = (props) => {
 
     return (
         <CardColumns>
-            {moviesToDisplay.map((movie) => {
+            {moviesToDisplay?.map((movie) => {
                 return (
                     <SingleMovieCard
                         key={movie.movieId}

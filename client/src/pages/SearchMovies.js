@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 // import TMDB API dependencies
 import { searchTMDB } from '../utils/API';
-import { cleanMovieData } from '../utils/movieData';
 
 // import react-bootstrap components
 import { Form, Button, Container, Jumbotron } from 'react-bootstrap';
@@ -21,21 +20,7 @@ const SearchMovies = () => {
             return false;
         }
 
-        try {
-            const response = await searchTMDB(searchInput);
-            
-            if (!response.ok) {
-                throw new Error('Something went wrong with the search!');
-            }
-
-            const { results } = await response.json();
-
-            const movieData = await cleanMovieData(results);
-
-            setSearchedMovies(movieData);
-        } catch (err) {
-            console.error(err);
-        }
+        searchTMDB(searchInput, setSearchedMovies);
     };
 
     return (
@@ -64,7 +49,7 @@ const SearchMovies = () => {
                 <h2 className="results-heading">
                     {searchedMovies.length > 0 && `Viewing ${searchedMovies.length} results:`}
                 </h2>
-                <MovieCards displayTrailers='true' moviesToDisplay={searchedMovies} />
+                <MovieCards displayTrailers moviesToDisplay={searchedMovies} />
             </Container>
         </>
     );
