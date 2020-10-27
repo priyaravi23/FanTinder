@@ -95,7 +95,7 @@ const Homepage = () => {
                 });
             })
 
-            idbPromise('moviesTodisplay', 'get').then((moviesToDisplay) => {
+            idbPromise('moviesToDisplay', 'get').then((moviesToDisplay) => {
                 dispatch({
                     type: UPDATE_MOVIES_TO_DISPLAY,
                     moviesToDisplay: moviesToDisplay
@@ -128,7 +128,6 @@ const Homepage = () => {
             // update the movies to display
             if (movies.length > 1) {
                 const updatedMovies = await movies.slice(1);
-                console.log({ updatedMovies });
                 setMovies(updatedMovies);
             } else {
                 console.log('no more movies!');
@@ -162,7 +161,6 @@ const Homepage = () => {
             // update the movies to display
             if (movies.length > 1) {
                 const updatedMovies = await movies.slice(1);
-                console.log({ updatedMovies });
                 setMovies(updatedMovies);
             } else {
                 console.log('no more movies!');
