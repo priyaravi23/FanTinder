@@ -21,21 +21,30 @@ export const QUERY_COMMENTS = gql`
 export const GET_USER = gql`
   {
     me {
-        _id
-        username
-        email
-        movieCount
-        removedMovies
-        savedMovies {
-              movieId
-              name
-              vote
-              overview
-              image
-              release
-              trailer
-              voteCount
-        }
+      _id
+      username
+      email
+      movieCount
+      removedMovies{
+        movieId
+        name
+        vote
+        overview
+        image
+        release
+        trailer
+        voteCount
+      }
+      savedMovies {
+        movieId
+        name
+        vote
+        overview
+        image
+        release
+        trailer
+        voteCount
+      }
     }
   }
 `;

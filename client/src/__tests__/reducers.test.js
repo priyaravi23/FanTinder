@@ -56,7 +56,28 @@ const initialState = {
             "voteCount": 347
         }
     ],
-    removedMovies: [3, 4]
+    removedMovies: [
+        {
+            "movieId": 3,  // updated movieId
+            "vote": 9.0,
+            "voteCount": 111,
+            "overview": "This is Grumpy Cat's movie",
+            "name": "Grumpy Cat",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg/220px-Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg",
+            "release": "2020-10-10",
+            "trailer": "https://www.youtube.com/watch?v=INscMGmhmX4"
+        },
+        {
+            "movieId": 4,  // updated movieId
+            "vote": 7.0,
+            "voteCount": 222,
+            "overview": "This is Grumpy Cat's Second Movie",
+            "name": "Grumpy Cat: The Sequel",
+            "image": "https://ichef.bbci.co.uk/news/400/cpsprodpb/26AC/production/_107000990_grumpycat5.jpg",
+            "release": "2020-10-24",
+            "trailer": "https://www.youtube.com/watch?v=g-1g3SDswGA"
+        }
+    ]
 };
 
 test('ADD_TO_REMOVED_MOVIES', () => {
@@ -86,7 +107,7 @@ test('ADD_TO_REMOVED_MOVIES', () => {
 
     // check removed movies
     expect(newState.removedMovies.length).toBe(3);
-    expect(newState.removedMovies[2]).toBe(590223);
+    expect(newState.removedMovies[2].movieId).toBe(590223);
     expect(initialState.removedMovies.length).toBe(2);
 });
 
@@ -117,7 +138,7 @@ test('ADD_TO_SAVED_MOVIES', () => {
 
     // check removed movies
     expect(newState.removedMovies.length).toBe(2);
-    expect(newState.removedMovies[0]).toBe(3);
+    expect(newState.removedMovies[0].movieId).toBe(3);
     expect(initialState.removedMovies.length).toBe(2);
 });
 
@@ -169,12 +190,21 @@ test('UPDATE_SAVED_MOVIES', () => {
 test('UPDATE_REMOVED_MOVIES', () => {
     let newState = reducer(initialState, {
         type: UPDATE_REMOVED_MOVIES,
-        removedMovies: [590223]
+        removedMovies: [{
+            "image": "https://image.tmdb.org/t/p/w500/r4Lm1XKP0VsTgHX4LG4syAwYA2I.jpg",
+            "movieId": 590223,
+            "name": "Love and Monsters",
+            "overview": "Seven years after the Monsterpocalypse, Joel Dawson, along with the rest of humanity, has been living underground ever since giant creatures took control of the land. After reconnecting over radio with his high school girlfriend Aimee, who is now 80 miles away at a coastal colony, Joel begins to fall for her again. As Joel realizes that there’s nothing left for him underground, he decides against all logic to venture out to Aimee, despite all the dangerous monsters that stand in his way.",
+            "release": "October 26, 2020",
+            "trailer": "https://www.youtube.com/embed/-19tBHrZwOM",
+            "vote": 7.6,
+            "voteCount": 168
+        }]
     });
 
     // check saved movies
     expect(newState.removedMovies.length).toBe(1);
-    expect(newState.removedMovies[0]).toBe(590223);
+    expect(newState.removedMovies[0].movieId).toBe(590223);
     expect(initialState.removedMovies.length).toBe(2);
     expect(initialState.removedMovies.length).toBe(2);
 });

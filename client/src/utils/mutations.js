@@ -9,7 +9,16 @@ export const ADD_USER = gql`
                 username
                 email
                 movieCount
-                removedMovies
+                removedMovies{
+                    movieId
+                    name
+                    vote
+                    voteCount
+                    overview
+                    image
+                    release
+                    trailer
+                }
                 savedMovies {
                     movieId
                     name
@@ -34,7 +43,16 @@ export const LOGIN_USER = gql`
                 username
                 email
                 movieCount
-                removedMovies
+                removedMovies{
+                    movieId
+                    name
+                    vote
+                    voteCount
+                    overview
+                    image
+                    release
+                    trailer
+                }
                 savedMovies {
                     movieId
                     name
@@ -57,7 +75,16 @@ export const SAVE_MOVIE = gql`
             username
             email
             movieCount
-            removedMovies
+            removedMovies {
+                movieId
+                name
+                vote
+                voteCount
+                overview
+                image
+                release
+                trailer
+            }
             savedMovies {
                 movieId
                 name
@@ -73,13 +100,22 @@ export const SAVE_MOVIE = gql`
 `;
 
 export const REMOVE_MOVIE = gql`
-    mutation removeMovie($movieId: Int!) {
-        removeMovie(movieId: $movieId) {
+    mutation saveMovie($input: movieInput!) {
+        saveMovie(input: $input) {
             _id
             username
             email
             movieCount
-            removedMovies
+            removedMovies {
+                movieId
+                name
+                vote
+                voteCount
+                overview
+                image
+                release
+                trailer
+            }
             savedMovies {
                 movieId
                 name

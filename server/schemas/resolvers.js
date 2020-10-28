@@ -125,7 +125,7 @@ const resolvers = {
                     { _id: context.user._id },
                     {
                         $addToSet: { savedMovies: input },
-                        $pull: { removedMovies: input.movieId } 
+                        $pull: { removedMovies: { movieId: input.movieId } }
                     },
                     { new: true }
                 );
@@ -134,13 +134,13 @@ const resolvers = {
             throw new AuthenticationError('You need to be logged in!')
         },
 
-        removeMovie: async (parent, { movieId }, context) => {
+        removeMovie: async (parent, { input }, context) => {
             if (context.user) {
                 const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
                     {
-                        $addToSet: { removedMovies: movieId },
-                        $pull: { savedMovies: { movieId } } 
+                        $addToSet: { removedMovies: input },
+                        $pull: { savedMovies: { movieId: input.movieId } }
                     },
                     { new: true }
                 );

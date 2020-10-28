@@ -2,7 +2,7 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
     type Movie {
-        movieId: String
+        movieId: Int
         vote: Float
         voteCount: Int
         overview: String
