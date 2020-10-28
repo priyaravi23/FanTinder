@@ -24,7 +24,7 @@ db.once('open', async () => {
 
 // create savedMovies
     for (let i = 0; i < 100; i += 1) {
-      const movieId = faker.address.zipcode();
+      const movieId = faker.address.zipCode();
       const release = faker.lorem.word();
       const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
       const image = faker.image.imageUrl();
@@ -46,7 +46,7 @@ db.once('open', async () => {
 
 // create removedMovies
 for (let i = 0; i < 100; i += 1) {
-  const movieId = faker.address.zipcode();
+  const movieId = faker.address.zipCode();
   const release = faker.lorem.word();
   const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
   const image = faker.image.imageUrl();

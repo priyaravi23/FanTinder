@@ -35,12 +35,13 @@ const Homepage = () => {
     const { loading, data } = useQuery(GET_USER);
 
     useEffect(() => {
-        if (movies.length === 0) {
-            getTrendingMovies('week', setMovies);
+        if (!movies[0]) {
+            // get the trending movies
+            getTrendingMovies('day', setMovies);
         } else {
             const filteredMovies = movies.filter(movie => {
                 const isSaved = state.savedMovies.some(savedMovie => savedMovie.movieId === movie.movieId);
-                const isRemoved = state.removedMovies.some(removedMovie => removedMovie.movieId === movie.movieId);
+                const isRemoved = state.removedMovies.some(removedMovieId => removedMovieId === movie.movieId);
  
                 return !isSaved && !isRemoved
             })
@@ -56,7 +57,7 @@ const Homepage = () => {
 
             setDisplayedMovie(filteredMovies[0]);
         }
-    }, [movies, state.savedMovies, state.removedMovies, dispatch])
+    }, [movies, state.savedMovies, state.removedMovies])
 
     // get the movies from The Movie Database endpoints
     useEffect(() => {
@@ -71,8 +72,8 @@ const Homepage = () => {
                 savedMovies: data.me.savedMovies
             })
 
-            data.me.removedMovies.forEach((movie) => {
-                idbPromise('removedMovies', 'put', movie);
+            data.me.removedMovies.forEach((movieId) => {
+                idbPromise('removedMovies', 'put', { movieId });
             });
     
             data.me.savedMovies.forEach((movie) => {
@@ -121,8 +122,8 @@ const Homepage = () => {
             });
 
             idbPromise('savedMovies', 'put', movie);
-            idbPromise('moviesToDisplay', 'delete', { ...movie });
-            idbPromise('removedMovies', 'delete', { ...movie });
+            idbPromise('moviesToDisplay', 'delete', movie);
+            idbPromise('removedMovies', 'delete', { movieId: movie.movieId });
 
             // update the movies to display
             if (movies.length > 1) {
@@ -140,7 +141,7 @@ const Homepage = () => {
         try {
             // update the db
             const { data } = await removeMovie({
-                variables: { input: movie }
+                variables: { movieId: movie.movieId }
             });
 
             if (removeError) {
@@ -155,7 +156,7 @@ const Homepage = () => {
 
             idbPromise('savedMovies', 'delete', { ...movie });
             idbPromise('moviesToDisplay', 'delete', { ...movie });
-            idbPromise('removedMovies', 'put', movie);
+            idbPromise('removedMovies', 'put', { movieId: movie.movieId });
 
             // update the movies to display
             if (movies.length > 1) {
@@ -172,7 +173,9 @@ const Homepage = () => {
     const handleSkipMovie = async ( ) => {
         // update the movies to display
         if (movies.length > 1) {
-            setMovies(movies.slice(1))
+            const updatedMovies = await movies.slice(1);
+            updatedMovies.push(displayedMovie);
+            setMovies(updatedMovies); // this isn't working
         } else {
             console.log('no more movies!');
         }
@@ -192,8 +195,8 @@ const Homepage = () => {
             </Jumbotron>
 
             <Container className="home-movie-container">
-                {displayedMovie &&
-                    <SingleMovieCard
+                {displayedMovie
+                    ? <SingleMovieCard
                         displayTrailer
                         displaySkipButton
                         movie={displayedMovie}
@@ -202,6 +205,7 @@ const Homepage = () => {
                         removeMovieHandler={handleRemoveMovie}
                         disabled={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId)}
                         btnColor={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId) ? "outline-secondary" : "outline-success" } />
+                    : <h2>No more movies to display! Check back tomorrow.</h2>
                 }
             </Container>
         </>
