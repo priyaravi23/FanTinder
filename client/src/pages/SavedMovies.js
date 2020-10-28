@@ -19,7 +19,9 @@ const SavedMovies = () => {
                         ? `Viewing ${state.savedMovies.length} saved ${state.savedMovies.length === 1 ? 'movie' : 'movies'}:`
                         : 'You have no saved movies!'}
                 </h2>
-                <MovieCards moviesToDisplay={state.savedMovies} displayTrailers />
+                <MovieCards
+                    moviesToDisplay={state.savedMovies}
+                    displayTrailers />
             </Container>
         </>
     );

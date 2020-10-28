@@ -100,8 +100,8 @@ export const SAVE_MOVIE = gql`
 `;
 
 export const REMOVE_MOVIE = gql`
-    mutation saveMovie($input: movieInput!) {
-        saveMovie(input: $input) {
+    mutation removeMovie($input: movieInput!) {
+        removeMovie(input: $input) {
             _id
             username
             email

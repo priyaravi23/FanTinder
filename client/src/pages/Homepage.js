@@ -41,7 +41,7 @@ const Homepage = () => {
         } else {
             const filteredMovies = movies.filter(movie => {
                 const isSaved = state.savedMovies.some(savedMovie => savedMovie.movieId === movie.movieId);
-                const isRemoved = state.removedMovies.some(removedMovieId => removedMovieId === movie.movieId);
+                const isRemoved = state.removedMovies.some(removedMovie => removedMovie.movieId === movie.movieId);
  
                 return !isSaved && !isRemoved
             })
@@ -57,7 +57,7 @@ const Homepage = () => {
 
             setDisplayedMovie(filteredMovies[0]);
         }
-    }, [movies, state.savedMovies, state.removedMovies])
+    }, [movies, state.savedMovies, state.removedMovies, dispatch])
 
     // get the movies from The Movie Database endpoints
     useEffect(() => {
@@ -72,8 +72,8 @@ const Homepage = () => {
                 savedMovies: data.me.savedMovies
             })
 
-            data.me.removedMovies.forEach((movieId) => {
-                idbPromise('removedMovies', 'put', { movieId });
+            data.me.removedMovies.forEach((movie) => {
+                idbPromise('removedMovies', 'put', movie);
             });
     
             data.me.savedMovies.forEach((movie) => {
@@ -122,8 +122,8 @@ const Homepage = () => {
             });
 
             idbPromise('savedMovies', 'put', movie);
-            idbPromise('moviesToDisplay', 'delete', movie);
-            idbPromise('removedMovies', 'delete', { movieId: movie.movieId });
+            idbPromise('moviesToDisplay', 'delete', { ...movie });
+            idbPromise('removedMovies', 'delete', { ...movie });
 
             // update the movies to display
             if (movies.length > 1) {
@@ -141,7 +141,7 @@ const Homepage = () => {
         try {
             // update the db
             const { data } = await removeMovie({
-                variables: { movieId: movie.movieId }
+                variables: { input: movie }
             });
 
             if (removeError) {
@@ -156,7 +156,7 @@ const Homepage = () => {
 
             idbPromise('savedMovies', 'delete', { ...movie });
             idbPromise('moviesToDisplay', 'delete', { ...movie });
-            idbPromise('removedMovies', 'put', { movieId: movie.movieId });
+            idbPromise('removedMovies', 'put', movie);
 
             // update the movies to display
             if (movies.length > 1) {
@@ -173,9 +173,7 @@ const Homepage = () => {
     const handleSkipMovie = async ( ) => {
         // update the movies to display
         if (movies.length > 1) {
-            const updatedMovies = await movies.slice(1);
-            updatedMovies.push(displayedMovie);
-            setMovies(updatedMovies); // this isn't working
+            setMovies(movies.slice(1))
         } else {
             console.log('no more movies!');
         }

@@ -8,10 +8,10 @@ const resolvers = {
             if(context.user) {
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
-                    .populate('comments')
-                    .populate('friends')
-                    .populate('savedMovies')
-                    .populate('removedMovies');
+                    // .populate('comments')
+                    // .populate('friends')
+                    // .populate('savedMovies')
+                    // .populate('removedMovies');
                 return userData;
             }
 
@@ -93,7 +93,7 @@ const resolvers = {
 
         addReaction: async (parent, { commentId, reactionBody }, context) => {
             if (context.user) {
-                const updatedComment = await Comment.findOneAndUpdate(
+                const updatedComment = await Comment.findByIdAndUpdate(
                     { _id: commentId },
                     { $push: { reactions: { reactionBody, username: context.user.username } } },
                     { new: true, runValidators: true }
@@ -107,7 +107,7 @@ const resolvers = {
 
         addFriend: async (parent, { friendId }, context) => {
             if (context.user) {
-                const updatedUser = await User.findOneAndUpdate(
+                const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     { $addToSet: { friends: friendId } },
                     { new: true }
@@ -136,7 +136,7 @@ const resolvers = {
 
         removeMovie: async (parent, { input }, context) => {
             if (context.user) {
-                const updatedUser = await User.findOneAndUpdate(
+                const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     {
                         $addToSet: { removedMovies: input },
