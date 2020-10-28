@@ -24,8 +24,8 @@ const typeDefs = gql`
         email: String
         friendCount: Int
         friends: [User]
-        likedMovies: [ID]
-        dislikedMovies: [ID]
+        likedMovies: [Movie]
+        dislikedMovies: [Movie]
     }
 
     type Query {

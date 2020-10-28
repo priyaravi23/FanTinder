@@ -7,7 +7,9 @@ const resolvers = {
         me: async (parent, args, context) => {
             if(context.user) {
                 const userData = await User.findOne({ _id: context.user._id })
-                    .select('-__v -password');
+                    .select('-__v -password')
+                    .populate('dislikedMovies')
+                    .populate('likedMovies');
                 
                 return userData;
             }
@@ -18,7 +20,9 @@ const resolvers = {
         // get all users
         users: async () => {
             return User.find()
-                .select('-__v -password');
+                .select('-__v -password')
+                .populate('dislikedMovies')
+                .populate('likedMovies');
         },
 
         // get a user by username
@@ -86,7 +90,9 @@ const resolvers = {
                         $pull: { dislikedMovies: movieId }
                     },
                     { new: true }
-                );
+                )
+                .populate('dislikedMovies')
+                .populate('likedMovies');
 
                 return updatedUser;
             }
@@ -102,7 +108,9 @@ const resolvers = {
                         $pull: { likedMovies: movieId }
                     },
                     { new: true }
-                );
+                )
+                .populate('dislikedMovies')
+                .populate('likedMovies');
 
                 return updatedUser;
             }

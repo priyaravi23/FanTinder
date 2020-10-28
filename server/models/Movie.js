@@ -2,9 +2,6 @@ const { Schema, model } = require('mongoose');
 
 const movieSchema = new Schema(
     {
-        movieId: {
-            type: Schema.Types.ObjectId
-        },
         tmdbId: {
             type: Number,
             required: true,

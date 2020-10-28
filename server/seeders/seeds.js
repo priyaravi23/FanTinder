@@ -24,8 +24,8 @@ db.once('open', async () => {
 
 // create savedMovies
     for (let i = 0; i < 100; i += 1) {
-      const movieId = faker.random.number()*5;
-      const release = faker.lorem.word();  // need to update this to date string format so that it displays on card
+      const movieId = faker.address.zipcode();
+      const release = faker.lorem.word();
       const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
       const image = faker.image.imageUrl();
       //example//'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rplLJ2hPcOQmkFhTqUte0MkEaO2.jpg'
@@ -46,8 +46,8 @@ db.once('open', async () => {
 
 // create removedMovies
 for (let i = 0; i < 100; i += 1) {
-  const movieId = faker.random.number()*5;
-  const release = faker.lorem.word();  // need to update this to date string format so that it displays on card
+  const movieId = faker.address.zipcode();
+  const release = faker.lorem.word();
   const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
   const image = faker.image.imageUrl();
   //example//'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rplLJ2hPcOQmkFhTqUte0MkEaO2.jpg'

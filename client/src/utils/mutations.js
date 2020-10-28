@@ -8,8 +8,6 @@ export const ADD_USER = gql`
                 _id
                 username
                 email
-                likedMovies
-                dislikedMovies
             }
         }
     }
@@ -23,8 +21,28 @@ export const LOGIN_USER = gql`
                 _id
                 username
                 email
-                likedMovies
-                dislikedMovies
+                likedMovies {
+                    _id
+                    tmdbId
+                    rating
+                    voteCount
+                    title
+                    overview
+                    releaseDate
+                    poster
+                    trailer
+                }
+                dislikedMovies{
+                    _id
+                    tmdbId
+                    rating
+                    voteCount
+                    title
+                    overview
+                    releaseDate
+                    poster
+                    trailer
+                }
             }
         }
     }
@@ -48,10 +66,28 @@ export const ADD_MOVIE = gql`
 export const LIKE_MOVIE = gql`
     mutation likeMovie($movieId: ID!) {
         likeMovie(movieId: $movieId) {
-            username
-            email
-            likedMovies
-            dislikedMovies
+            likedMovies {
+                _id
+                tmdbId
+                rating
+                voteCount
+                title
+                overview
+                releaseDate
+                poster
+                trailer
+            }
+            dislikedMovies{
+                _id
+                tmdbId
+                rating
+                voteCount
+                title
+                overview
+                releaseDate
+                poster
+                trailer
+            }
         }
     }
 `;
@@ -59,10 +95,28 @@ export const LIKE_MOVIE = gql`
 export const DISLIKE_MOVIE = gql`
     mutation dislikeMovie($movieId: ID!) {
         dislikeMovie(movieId: $movieId) {
-            username
-            email
-            likedMovies
-            dislikedMovies
+            likedMovies {
+                _id
+                tmdbId
+                rating
+                voteCount
+                title
+                overview
+                releaseDate
+                poster
+                trailer
+            }
+            dislikedMovies{
+                _id
+                tmdbId
+                rating
+                voteCount
+                title
+                overview
+                releaseDate
+                poster
+                trailer
+            }
         }
     }
 `;
