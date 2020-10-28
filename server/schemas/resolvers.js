@@ -31,6 +31,12 @@ const resolvers = {
                 .select('-__v -password');
         },
 
+        // get a movie by _id
+        movies: async (parent, { movieId }) => {
+            return Movie.findOne({ _id: movieId })
+                .select('-__v');
+        },
+
         // get all movies
         movies: async () => {
             return Movie.find().select('-__v');
