@@ -8,7 +8,7 @@ const typeDefs = gql`
 
     type Movie {
         _id: ID
-        tmdbId: Int
+        externalMovieId: Int
         rating: Float
         voteCount: Int
         title: String
@@ -37,7 +37,7 @@ const typeDefs = gql`
     }
 
     input MovieInput {
-        tmdbId: Int
+        externalMovieId: Int
         rating: Float
         voteCount: Int
         title: String

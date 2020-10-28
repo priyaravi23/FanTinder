@@ -15,7 +15,7 @@ export const GET_USER = gql`
 export const GET_MOVIES = gql`
   {
     movies {
-      movieId
+      externalMovieId
       rating
       voteCount
       title

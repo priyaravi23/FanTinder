@@ -20,11 +20,17 @@ const userSchema = new Schema(
         },
         likedMovies: [{
             type: Schema.Types.ObjectId,
-            ref: 'Movie'
+            ref: 'Movie',
+            validate: (arr) => {
+                return arr.filter(v => v === null).length === 0; 
+            }
         }],
         dislikedMovies: [{
             type: Schema.Types.ObjectId,
-            ref: 'Movie'
+            ref: 'Movie',
+            validate: (arr) => {
+                return arr.filter(v => v === null).length === 0; 
+            }
         }]
     },
     // set this to use virtual below

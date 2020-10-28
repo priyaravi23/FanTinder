@@ -2,7 +2,7 @@ const { Schema, model } = require('mongoose');
 
 const movieSchema = new Schema(
     {
-        tmdbId: {
+        externalMovieId: {
             type: Number,
             required: true,
             unique: true

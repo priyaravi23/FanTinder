@@ -23,7 +23,7 @@ export const LOGIN_USER = gql`
                 email
                 likedMovies {
                     _id
-                    tmdbId
+                    externalMovieId
                     rating
                     voteCount
                     title
@@ -34,7 +34,7 @@ export const LOGIN_USER = gql`
                 }
                 dislikedMovies{
                     _id
-                    tmdbId
+                    externalMovieId
                     rating
                     voteCount
                     title
@@ -68,7 +68,7 @@ export const LIKE_MOVIE = gql`
         likeMovie(movieId: $movieId) {
             likedMovies {
                 _id
-                tmdbId
+                externalMovieId
                 rating
                 voteCount
                 title
@@ -79,7 +79,7 @@ export const LIKE_MOVIE = gql`
             }
             dislikedMovies{
                 _id
-                tmdbId
+                externalMovieId
                 rating
                 voteCount
                 title
@@ -97,7 +97,7 @@ export const DISLIKE_MOVIE = gql`
         dislikeMovie(movieId: $movieId) {
             likedMovies {
                 _id
-                tmdbId
+                externalMovieId
                 rating
                 voteCount
                 title
@@ -108,7 +108,7 @@ export const DISLIKE_MOVIE = gql`
             }
             dislikedMovies{
                 _id
-                tmdbId
+                externalMovieId
                 rating
                 voteCount
                 title
