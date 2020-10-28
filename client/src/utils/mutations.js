@@ -3,32 +3,13 @@ import gql from 'graphql-tag';
 export const ADD_USER = gql`
     mutation addUser($username: String!, $email: String!, $password: String!) {
         addUser(username: $username, email: $email, password: $password) {
-        token
+            token
             user {
                 _id
                 username
                 email
-                movieCount
-                removedMovies{
-                    movieId
-                    name
-                    vote
-                    voteCount
-                    overview
-                    image
-                    release
-                    trailer
-                }
-                savedMovies {
-                    movieId
-                    name
-                    vote
-                    voteCount
-                    overview
-                    image
-                    release
-                    trailer
-                }
+                likedMovies
+                dislikedMovies
             }
         }
     }
@@ -37,95 +18,51 @@ export const ADD_USER = gql`
 export const LOGIN_USER = gql`
     mutation login($email: String!, $password: String!) {
         login(email: $email, password: $password) {
-        token
+            token
             user {
                 _id
                 username
                 email
-                movieCount
-                removedMovies{
-                    movieId
-                    name
-                    vote
-                    voteCount
-                    overview
-                    image
-                    release
-                    trailer
-                }
-                savedMovies {
-                    movieId
-                    name
-                    vote
-                    voteCount
-                    overview
-                    image
-                    release
-                    trailer
-                }
+                likedMovies
+                dislikedMovies
             }
         }
     }
 `;
 
-export const SAVE_MOVIE = gql`
-    mutation saveMovie($input: movieInput!) {
-        saveMovie(input: $input) {
-            _id
+export const ADD_MOVIE = gql`
+    mutation addMovie($input: MovieInput!) {
+        addMovie(input:$input) {
+            movieId
+            title
+            overview
+            releaseDate
+            rating
+            voteCount
+            poster
+            trailer
+        }
+    }
+`
+
+export const LIKE_MOVIE = gql`
+    mutation likeMovie($movieId: ID!) {
+        likeMovie(movieId: $movieId) {
             username
             email
-            movieCount
-            removedMovies {
-                movieId
-                name
-                vote
-                voteCount
-                overview
-                image
-                release
-                trailer
-            }
-            savedMovies {
-                movieId
-                name
-                vote
-                voteCount
-                overview
-                image
-                release
-                trailer
-            }
+            likedMovies
+            dislikedMovies
         }
     }
 `;
 
-export const REMOVE_MOVIE = gql`
-    mutation removeMovie($input: movieInput!) {
-        removeMovie(input: $input) {
-            _id
+export const DISLIKE_MOVIE = gql`
+    mutation dislikeMovie($movieId: ID!) {
+        dislikeMovie(movieId: $movieId) {
             username
             email
-            movieCount
-            removedMovies {
-                movieId
-                name
-                vote
-                voteCount
-                overview
-                image
-                release
-                trailer
-            }
-            savedMovies {
-                movieId
-                name
-                vote
-                voteCount
-                overview
-                image
-                release
-                trailer
-            }
+            likedMovies
+            dislikedMovies
         }
     }
 `;

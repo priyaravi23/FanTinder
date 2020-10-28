@@ -1,9 +1,6 @@
 const { Schema, model } = require('mongoose');
 const bcrypt = require('bcrypt');
 
-// import schema from Movie.js
-const movieSchema = require('./Movie');
-
 const userSchema = new Schema(
     {
         username: {
@@ -21,20 +18,14 @@ const userSchema = new Schema(
             type: String,
             required: true,
         },
-        // set savedMovies to be an array of data that adheres to the movieSchema
-        savedMovies: {
-            type: [movieSchema],
-            validate: (arr) => {
-                return arr.filter(v => v === null).length === 0;
-            }
-        },
-        // set removedMovies to be an array of movieIds (strings) as defined by movieSchema
-        removedMovies: {
-            type: [movieSchema],
-            validate: (arr) => {
-                return arr.filter(v => v === null).length === 0;
-            }
-        },
+        likedMovies: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Movie'
+        }],
+        dislikedMovies: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Movie'
+        }]
     },
     // set this to use virtual below
     {
@@ -58,11 +49,6 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.isCorrectPassword = async function (password) {
     return bcrypt.compare(password, this.password);
 };
-
-// when we query a user, we'll also get another field called `movieCount` with the number of saved movies we have
-userSchema.virtual('movieCount').get(function () {
-    return this.savedMovies.length;
-});
 
 const User = model('User', userSchema);
 
