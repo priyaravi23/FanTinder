@@ -1,35 +1,38 @@
-const { Schema } = require('mongoose');
+const { Schema, model } = require('mongoose');
 
 const movieSchema = new Schema(
     {
-        release: {
-            type: String,
-        },
-        overview: {
-            type: String,
+        externalMovieId: {
+            type: Number,
             required: true,
+            unique: true
         },
-        movieId: {
-            type: String,
-            required: true,
-        },
-        image: {
-            type: String,
-        },
-        trailer: {
-            type: String,
-        },
-        vote: {
+        rating: {
             type: Number,
         },
         voteCount: {
             type: Number,
         },
-        name: {
+        title: {
             type: String,
             required: true,
         },
+        overview: {
+            type: String,
+            required: true,
+        },
+        releaseDate: {
+            type: String,
+        },
+        poster: {
+            type: String,
+        },
+        trailer: {
+            type: String,
+        }
     }
 );
 
-module.exports = movieSchema;
+const Movie = model('Movie', movieSchema);
+
+module.exports = Movie;

@@ -3,23 +3,11 @@ import gql from 'graphql-tag';
 export const ADD_USER = gql`
     mutation addUser($username: String!, $email: String!, $password: String!) {
         addUser(username: $username, email: $email, password: $password) {
-        token
+            token
             user {
                 _id
                 username
                 email
-                movieCount
-                removedMovies
-                savedMovies {
-                    movieId
-                    name
-                    vote
-                    voteCount
-                    overview
-                    image
-                    release
-                    trailer
-                }
             }
         }
     }
@@ -28,21 +16,31 @@ export const ADD_USER = gql`
 export const LOGIN_USER = gql`
     mutation login($email: String!, $password: String!) {
         login(email: $email, password: $password) {
-        token
+            token
             user {
                 _id
                 username
                 email
-                movieCount
-                removedMovies
-                savedMovies {
-                    movieId
-                    name
-                    vote
+                likedMovies {
+                    _id
+                    externalMovieId
+                    rating
                     voteCount
+                    title
                     overview
-                    image
-                    release
+                    releaseDate
+                    poster
+                    trailer
+                }
+                dislikedMovies{
+                    _id
+                    externalMovieId
+                    rating
+                    voteCount
+                    title
+                    overview
+                    releaseDate
+                    poster
                     trailer
                 }
             }
@@ -50,44 +48,73 @@ export const LOGIN_USER = gql`
     }
 `;
 
-export const SAVE_MOVIE = gql`
-    mutation saveMovie($input: movieInput!) {
-        saveMovie(input: $input) {
-            _id
-            username
-            email
-            movieCount
-            removedMovies
-            savedMovies {
-                movieId
-                name
-                vote
+export const ADD_MOVIE = gql`
+    mutation addMovie($input: MovieInput!) {
+        addMovie(input:$input) {
+            movieId
+            title
+            overview
+            releaseDate
+            rating
+            voteCount
+            poster
+            trailer
+        }
+    }
+`
+
+export const LIKE_MOVIE = gql`
+    mutation likeMovie($movieId: ID!) {
+        likeMovie(movieId: $movieId) {
+            likedMovies {
+                _id
+                externalMovieId
+                rating
                 voteCount
+                title
                 overview
-                image
-                release
+                releaseDate
+                poster
+                trailer
+            }
+            dislikedMovies{
+                _id
+                externalMovieId
+                rating
+                voteCount
+                title
+                overview
+                releaseDate
+                poster
                 trailer
             }
         }
     }
 `;
 
-export const REMOVE_MOVIE = gql`
-    mutation removeMovie($movieId: Int!) {
-        removeMovie(movieId: $movieId) {
-            _id
-            username
-            email
-            movieCount
-            removedMovies
-            savedMovies {
-                movieId
-                name
-                vote
+export const DISLIKE_MOVIE = gql`
+    mutation dislikeMovie($movieId: ID!) {
+        dislikeMovie(movieId: $movieId) {
+            likedMovies {
+                _id
+                externalMovieId
+                rating
                 voteCount
+                title
                 overview
-                image
-                release
+                releaseDate
+                poster
+                trailer
+            }
+            dislikedMovies{
+                _id
+                externalMovieId
+                rating
+                voteCount
+                title
+                overview
+                releaseDate
+                poster
                 trailer
             }
         }
