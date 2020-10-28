@@ -35,9 +35,8 @@ const Homepage = () => {
     const { loading, data } = useQuery(GET_USER);
 
     useEffect(() => {
-        if (!movies[0]) {
-            // get the trending movies
-            getTrendingMovies('day', setMovies);
+        if (movies.length === 0) {
+            getTrendingMovies('week', setMovies);
         } else {
             const filteredMovies = movies.filter(movie => {
                 const isSaved = state.savedMovies.some(savedMovie => savedMovie.movieId === movie.movieId);
@@ -193,8 +192,8 @@ const Homepage = () => {
             </Jumbotron>
 
             <Container className="home-movie-container">
-                {displayedMovie
-                    ? <SingleMovieCard
+                {displayedMovie &&
+                    <SingleMovieCard
                         displayTrailer
                         displaySkipButton
                         movie={displayedMovie}
@@ -203,7 +202,6 @@ const Homepage = () => {
                         removeMovieHandler={handleRemoveMovie}
                         disabled={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId)}
                         btnColor={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId) ? "outline-secondary" : "outline-success" } />
-                    : <h2>No more movies to display! Check back tomorrow.</h2>
                 }
             </Container>
         </>

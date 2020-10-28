@@ -22,9 +22,19 @@ const userSchema = new Schema(
             required: true,
         },
         // set savedMovies to be an array of data that adheres to the movieSchema
-        savedMovies: [movieSchema],
+        savedMovies: {
+            type: [movieSchema],
+            validate: (arr) => {
+                return arr.filter(v => v === null).length === 0;
+            }
+        },
         // set removedMovies to be an array of movieIds (strings) as defined by movieSchema
-        removedMovies: [movieSchema],
+        removedMovies: {
+            type: [movieSchema],
+            validate: (arr) => {
+                return arr.filter(v => v === null).length === 0;
+            }
+        },
     },
     // set this to use virtual below
     {
