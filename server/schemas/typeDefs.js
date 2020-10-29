@@ -51,7 +51,8 @@ const typeDefs = gql`
         login(email: String!, password: String!): Auth
         addUser(username: String!, email: String!, password: String!): Auth
         addFriend(friendId: ID!): User
-        addMovie(input: MovieInput): Movie 
+        addMovie(input: MovieInput!): Movie
+        addMovies(input: [MovieInput!]): Boolean
         likeMovie(movieId: ID!): User
         dislikeMovie(movieId: ID!): User
     }

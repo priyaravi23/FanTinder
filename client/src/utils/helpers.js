@@ -1,4 +1,4 @@
-
+  
 export function idbPromise(storeName, method, object) {
   return new Promise((resolve, reject) => {
     // open connection to the database `fantinder` with the version of 1
@@ -11,9 +11,9 @@ export function idbPromise(storeName, method, object) {
     request.onupgradeneeded = function(e) {
       const db = request.result;
       // create object store for each type of data and set "primary" key index to be the `_id` of the data
-      db.createObjectStore('removedMovies', { keyPath: 'movieId' });
-      db.createObjectStore('savedMovies', { keyPath: 'movieId' });
-      db.createObjectStore('moviesToDisplay', { keyPath: 'movieId' });
+      db.createObjectStore('dislikedMovies', { keyPath: '_id' });
+      db.createObjectStore('likedMovies', { keyPath: '_id' });
+      db.createObjectStore('movies', { keyPath: '_id' });
     };
 
     // handle any errors with connecting
@@ -47,7 +47,7 @@ export function idbPromise(storeName, method, object) {
           };
           break;
         case 'delete':
-          store.delete(object.movieId);
+          store.delete(object._id);
           break;
         default:
           console.log('No valid method');

@@ -7,96 +7,132 @@ import { CardColumns } from 'react-bootstrap';
 import SingleMovieCard from './SingleMovieCard'
 
 // import GraphQL Dependencies
-import { SAVE_MOVIE, REMOVE_MOVIE } from '../utils/mutations';
-import { GET_USER } from '../utils/queries';
+import { DISLIKE_MOVIE, LIKE_MOVIE } from '../utils/mutations';
+import { GET_USER } from '../utils/queries'
 import { useMutation, useQuery } from '@apollo/react-hooks';
 
 // import GlobalState dependencies
 import { useFantinderContext } from "../utils/GlobalState";
-import { UPDATE_SAVED_MOVIES } from '../utils/actions';
+import {
+    UPDATE_DISLIKED_MOVIES,
+    UPDATE_LIKED_MOVIES,
+    UPDATE_MOVIES
+} from '../utils/actions';
 
 // import indexedDB dependencies
 import { idbPromise } from "../utils/helpers";
 
 const MovieCards = (props) => {
     const [state, dispatch] = useFantinderContext();
-    const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
-    const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
+    const { movies } = state;
+    const [dislikeMovie, { dislikeError }] = useMutation(DISLIKE_MOVIE);
+    const [likeMovie, { likeError }] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
-    const { moviesToDisplay , displayTrailers } = props;
 
+    let { moviesToDisplay, displayTrailers } = props;
+
+    // get the movie preferences for the current user
     useEffect(() => {
-        if(data) {
+        if (data && data.me) {
+            // get rid of __typename
+            const dislikedMovieIds = data.me.dislikedMovies.map(dislikedMovie => dislikedMovie._id);
+            const likedMovieIds = data.me.likedMovies.map(likedMovie => likedMovie._id);
+
             dispatch({
-                type: UPDATE_SAVED_MOVIES,
-                savedMovies: data.me.savedMovies
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: dislikedMovieIds
             })
+
+            dispatch({
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: likedMovieIds
+            })
+
+            data.me.dislikedMovies.forEach((movie) => {
+                idbPromise('dislikedMovies', 'put', movie);
+            });
     
-            data.me.savedMovies.forEach((movie) => {
-                idbPromise('savedMovies', 'put', movie);
+            data.me.likedMovies.forEach((movie) => {
+                idbPromise('likedMovies', 'put', movie);
             });
-        // add else if to check if `loading` is undefined in `useQuery()` Hook
         } else if (!loading) {
-            // since we're offline, get all of the data from the `savedMovies` store
-            idbPromise('savedMovies', 'get').then((savedMovies) => {
-                // use retrieved data to set global state for offline browsing
-                dispatch({
-                    type: UPDATE_SAVED_MOVIES,
-                    savedMovies: savedMovies
-                });
+            idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
+              dispatch({
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: dislikedMovies
+              });
             });
-        }
+
+            idbPromise('likedMovies', 'get').then(likedMovies => {
+              dispatch({
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: likedMovies
+              });
+            });
+          }
     }, [data, loading, dispatch]);
 
-    const handleSaveMovie = async (movie) => {
+    const handleLikeMovie = async (likedMovieId) => {
         try {
             // update the db
-            const { data } = await saveMovie({
-                variables: { input: movie }
+            let { data } = await likeMovie({
+                variables: { movieId: likedMovieId }
             });
 
-            // get savedMovies from the updated User
-            const { saveMovie: saveMovieData } = data;
-            const { savedMovies: updatedSavedMovies } = saveMovieData;
-
-            if (saveError) {
+            // throw an error if the mutation failed
+            if (likeError) {
                 throw new Error('Something went wrong!');
             }
 
+            const likedMovieIds = await data.likeMovie.likedMovies.map(movie => movie._id);
+            const dislikedMovieIds = await data.likeMovie.dislikedMovies.map(movie => movie._id);
+
             // update global state
             dispatch({
-                type: UPDATE_SAVED_MOVIES,
-                savedMovies: updatedSavedMovies
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: likedMovieIds
+            });
+            dispatch({
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: dislikedMovieIds
             });
 
-            idbPromise('savedMovies', 'put', { ...movie });
+            // update idb
+            idbPromise('likedMovies', 'put', {_id: likedMovieId });
+            idbPromise('dislikedMovies', 'delete', {_id: likedMovieId});
         } catch (err) {
             console.error(err);
         }
     };
 
-    const handleRemoveMovie = async (movie) => {
+    const handleDislikeMovie = async (dislikedMovieId) => {
         try {
             // update the db
-            const { data } = await removeMovie({
-                variables: { movieId: movie.movieId }
+            let { data } = await dislikeMovie({
+                variables: { movieId: dislikedMovieId }
             });
 
-            // get savedMovies from the updated User
-            const { removeMovie: saveMovieData } = data;
-            const { savedMovies: updatedSavedMovies } = saveMovieData;
-
-            if (removeError) {
+            // throw an error if the mutation failed
+            if (dislikeError) {
                 throw new Error('Something went wrong!');
             }
 
+            const likedMovieIds = await data.dislikeMovie.likedMovies.map(movie => movie._id);
+            const dislikedMovieIds = await data.dislikeMovie.dislikedMovies.map(movie => movie._id);
+
             // update global state
             dispatch({
-                type: UPDATE_SAVED_MOVIES,
-                savedMovies: updatedSavedMovies
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: likedMovieIds
+            });
+            dispatch({
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: dislikedMovieIds
             });
 
-            idbPromise('savedMovies', 'delete', { ...movie });
+            // update idb
+            idbPromise('dislikedMovies', 'put', { _id: dislikedMovieId });
+            idbPromise('likedMovies', 'delete', { _id: dislikedMovieId });
         } catch (err) {
             console.error(err);
         }
@@ -104,16 +140,14 @@ const MovieCards = (props) => {
 
     return (
         <CardColumns>
-            {moviesToDisplay?.map((movie) => {
+            {moviesToDisplay?.map(movie => {
                 return (
                     <SingleMovieCard
-                        key={movie.movieId}
+                        key={movie.externalMovieId} // failing here means that there are duplicate movies in the global state.
                         displayTrailer={displayTrailers}
                         movie={movie}
-                        saveMovieHandler={handleSaveMovie}
-                        removeMovieHandler={handleRemoveMovie}
-                        disabled={state.savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId)}
-                        btnColor={state.savedMovies?.some((savedMovie) => savedMovie.movieId === movie.movieId) ? "outline-secondary" : "outline-success" }
+                        likeMovieHandler={handleLikeMovie}
+                        dislikeMovieHandler={handleDislikeMovie}
                         />
                     )
                 })

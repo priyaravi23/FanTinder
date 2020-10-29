@@ -5,7 +5,7 @@ const { AuthenticationError } = require('apollo-server-express');
 const resolvers = {
     Query: {
         me: async (parent, args, context) => {
-            if(context.user) {
+            if (context.user) {
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
                     .populate('dislikedMovies')
@@ -39,9 +39,16 @@ const resolvers = {
                 .select('-__v');
         },
 
+        // get a movie by id
+        movie: async (parent, { movieId }) => {
+            return Movie.findOne({ _id: movieId })
+                .select('-__v');
+        },
+
         // get all movies
         movies: async () => {
-            return Movie.find().select('-__v');
+            return Movie.find()
+                .select('-__v');
         }
     },
 
@@ -85,8 +92,36 @@ const resolvers = {
         },
 
         addMovie: async (parent, { input }) => {
-            const movie = await Movie.create(input);
+            const movie = await Movie.findOneAndUpdate(
+                { externalMovieId: input.externalMovieId },
+                input,
+                { upsert: true, new: true }
+            );
             return movie;
+        },
+
+        addMovies: async (parent, { input }) => {
+            // prep docs to upsert
+            const bulkOps = await input.map((movie) => {
+                return {
+                    updateOne: {
+                        filter: { externalMovieId: movie.externalMovieId },
+                        update: movie,
+                        upsert: true,
+                        new: true
+                    }
+                }
+            })
+            
+            // upsert all of the movies
+            const movieCount = await Movie.bulkWrite(bulkOps).then(res => {
+                const { modifiedCount, upsertedCount } = res;
+                return modifiedCount || upsertedCount;
+            }).catch(err => {
+                console.error(err);
+            });
+
+            return movieCount
         },
 
         likeMovie: async (parent, { movieId }, context) => {

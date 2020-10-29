@@ -4,19 +4,17 @@ import React, { useEffect, useState } from 'react';
 import { getTrendingMovies } from '../utils/API';
 
 // import GraphQL Dependencies
-import { SAVE_MOVIE, REMOVE_MOVIE } from '../utils/mutations';
-import { GET_USER } from '../utils/queries';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { DISLIKE_MOVIE, LIKE_MOVIE, ADD_MOVIE } from '../utils/mutations';
+import { useMutation } from '@apollo/react-hooks';
 
 // import GlobalState dependencies
 import { useFantinderContext } from "../utils/GlobalState";
-import { 
-    ADD_TO_REMOVED_MOVIES,
-    ADD_TO_SAVED_MOVIES,
-    UPDATE_MOVIES_TO_DISPLAY,
-    UPDATE_REMOVED_MOVIES,
-    UPDATE_SAVED_MOVIES }
-from '../utils/actions';
+import {
+    ADD_TO_MOVIES,
+    UPDATE_DISLIKED_MOVIES,
+    UPDATE_LIKED_MOVIES,
+    UPDATE_MOVIES
+} from '../utils/actions';
 
 // import components
 import { Container, Jumbotron } from 'react-bootstrap';
@@ -24,188 +22,230 @@ import SingleMovieCard from '../components/SingleMovieCard';
 
 // import indexedDB dependencies
 import { idbPromise } from "../utils/helpers";
+import { cleanMovieData } from '../utils/movieData';
+
+import Auth from '../utils/auth';
 
 const Homepage = () => {
     const [state, dispatch] = useFantinderContext();
-    const [movies, setMovies] = useState([]);
+    const { movies, likedMovies, dislikedMovies } = state
+
     const [displayedMovie, setDisplayedMovie] = useState('');
+    const [displayedMovieIndex, setDisplayedMovieIndex] = useState('');
 
-    const [removeMovie, { removeError }] = useMutation(REMOVE_MOVIE);
-    const [saveMovie, { saveError }] = useMutation(SAVE_MOVIE);
-    const { loading, data } = useQuery(GET_USER);
+    const [dislikeMovie, { dislikeError }] = useMutation(DISLIKE_MOVIE);
+    const [likeMovie, { likeError }] = useMutation(LIKE_MOVIE);
+    const [addMovie, { addMovieError }] = useMutation(ADD_MOVIE);
 
     useEffect(() => {
-        if (!movies[0]) {
-            // get the trending movies
-            getTrendingMovies('day', setMovies);
-        } else {
-            const filteredMovies = movies.filter(movie => {
-                const isSaved = state.savedMovies.some(savedMovie => savedMovie.movieId === movie.movieId);
-                const isRemoved = state.removedMovies.some(removedMovieId => removedMovieId === movie.movieId);
- 
-                return !isSaved && !isRemoved
-            })
+        if (!movies.length) {
+            async function fetchData() {
+                // get trending movies from the movie database API
+                const response = await getTrendingMovies('week');
 
-            dispatch({
-                type: UPDATE_MOVIES_TO_DISPLAY,
-                moviesToDisplay: filteredMovies
-            })
+                if (!response.ok) {
+                    throw new Error("Couldn't load trending movies.");
+                }
+
+                const { results } = await response.json();
+        
+                // reformat the data
+                const cleanedMovieData = await cleanMovieData(results);
+
+                // store the data in the db, global state, and idb
+                cleanedMovieData.forEach(async movie => {
+                    // add the movie to the db
+                    const { data } = await addMovie({
+                        variables: { input: movie }
+                    })
+
+                    if (addMovieError) {
+                        throw new Error("Could not create a new movie");
+                    }
+
+                    const { addMovie: newMovie } = data;
+
+                    // update state.movies
+                    dispatch({
+                        type: ADD_TO_MOVIES,
+                        movie: newMovie
+                    })
+
+                    // add to idb
+                    idbPromise('movies', 'put', newMovie);
+                })
+            }
+            fetchData();
+        }
+    }, [movies.length, dispatch, addMovie, addMovieError, dislikedMovies, likedMovies]);
+
+    useEffect(() => {
+        // if there's no displayedMovie, we need to set it.
+        if (!displayedMovie && movies.length) {
+
+            // figure out where to start iterating
+            const startIndex = displayedMovieIndex ? displayedMovieIndex + 1: 0;
+
+            // set the displayedMovie to the first movie in movies that has not been liked or disliked
+            for (let i = startIndex; i < movies.length; i++) {
+                let movieToTest = movies[i];
+
+                const likedMovie = likedMovies.includes(movieToTest._id);
+                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+                // stop iterating as soon as there's a match
+                if (!likedMovie && !dislikedMovie) {
+                    setDisplayedMovieIndex(i);
+                    break;
+                }
+            }
+        }
+
+    }, [displayedMovie, setDisplayedMovieIndex, movies.length])
+
+
+    const handleLikeMovie = async (likedMovieId) => {
+        try {
+            // update the db
+            let { data } = await likeMovie({
+                variables: { movieId: likedMovieId }
+            });
+
+            // throw an error if the mutation failed
+            if (likeError) {
+                throw new Error('Something went wrong!');
+            }
             
-            filteredMovies.forEach((movie) => {
-                idbPromise('moviesToDisplay', 'put', movie);
+            // remove the movie from moviesToDisplay
+            const filteredMovies = await movies.filter(movie => movie._id !== likedMovieId);
+            const likedMovieIds = await data.likeMovie.likedMovies.map(movie => movie._id);
+            const dislikedMovieIds = await data.likeMovie.dislikedMovies.map(movie => movie._id);
+
+            // update global state
+            dispatch({
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: likedMovieIds
+            });
+            dispatch({
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: dislikedMovieIds
+            });
+            dispatch({
+                type: UPDATE_MOVIES,
+                movies: filteredMovies
             });
 
-            setDisplayedMovie(filteredMovies[0]);
+            // update idb
+            idbPromise('likedMovies', 'put', {_id: likedMovieId });
+            idbPromise('dislikedMovies', 'delete', {_id: likedMovieId});
+
+            // update movie displayed
+            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
+                let movieToTest = movies[i];
+
+                const likedMovie = likedMovie.includes(movieToTest._id);
+                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+                // stop iterating as soon as there's a match
+                if (!likedMovie && !dislikedMovie) {
+                    setDisplayedMovieIndex(i);
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error(err);
         }
-    }, [movies, state.savedMovies, state.removedMovies])
+    };
 
-    // get the movies from The Movie Database endpoints
-    useEffect(() => {
-        if (data) {
-            dispatch({
-                type: UPDATE_REMOVED_MOVIES,
-                removedMovies: data.me.removedMovies
-            })
-
-            dispatch({
-                type: UPDATE_SAVED_MOVIES,
-                savedMovies: data.me.savedMovies
-            })
-
-            data.me.removedMovies.forEach((movieId) => {
-                idbPromise('removedMovies', 'put', { movieId });
+    const handleDislikeMovie = async (dislikedMovieId) => {
+        try {
+            // update the db
+            let { data } = await dislikeMovie({
+                variables: { movieId: dislikedMovieId }
             });
+
+            // throw an error if the mutation failed
+            if (dislikeError) {
+                throw new Error('Something went wrong!');
+            }
+            
+            // remove the movie from moviesToDisplay
+            const filteredMovies = await movies.filter(movie => movie._id !== dislikedMovieId);
+
+            // update global state
+            dispatch({
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: data.dislikeMovie.likedMovies
+            });
+            dispatch({
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: data.dislikeMovie.dislikedMovies
+            });
+            dispatch({
+                type: UPDATE_MOVIES,
+                movies: filteredMovies
+            });
+
+            // update idb
+            idbPromise('dislikedMovies', 'put', { _id: dislikedMovieId });
+            idbPromise('likedMovies', 'delete', { _id: dislikedMovieId });
+
+            // update movie displayed
+            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
+                let movieToTest = movies[i];
+
+                const likedMovie = likedMovie.includes(movieToTest._id);
+                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+                // stop iterating as soon as there's a match
+                if (!likedMovie && !dislikedMovie) {
+                    setDisplayedMovieIndex(i);
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleSkipMovie = () => {
+        // update movie displayed
+        for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
+            let movieToTest = movies[i];
+
+            const likedMovie = likedMovies.includes(movieToTest._id);
+            const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+            // stop iterating as soon as there's a match
+            if (!likedMovie && !dislikedMovie) {
+                setDisplayedMovieIndex(i);
+                break;
+            }
+        }
+    }
     
-            data.me.savedMovies.forEach((movie) => {
-                idbPromise('savedMovies', 'put', movie);
-            });
-        // add else if to check if `loading` is undefined in `useQuery()` Hook (meaning we're offline)
-        } else if (!loading) {
-            idbPromise('removedMovies', 'get').then((removedMovies) => {
-                dispatch({
-                    type: UPDATE_REMOVED_MOVIES,
-                    removedMovies: removedMovies
-                });
-            });
-
-            idbPromise('savedMovies', 'get').then((savedMovies) => {
-                dispatch({
-                    type: UPDATE_SAVED_MOVIES,
-                    savedMovies: savedMovies
-                });
-            })
-
-            idbPromise('moviesToDisplay', 'get').then((moviesToDisplay) => {
-                dispatch({
-                    type: UPDATE_MOVIES_TO_DISPLAY,
-                    moviesToDisplay: moviesToDisplay
-                });
-            })  
-        }
-    }, [data, loading, dispatch]);
-
-    const handleSaveMovie = async (movie) => {
-        try {
-            // update the db
-            const { data } = await saveMovie({
-                variables: { input: movie }
-            });
-
-            if (saveError) {
-                throw new Error('Something went wrong!');
-            }
-
-            // update global state
-            dispatch({
-                type: ADD_TO_SAVED_MOVIES,
-                movie: movie
-            });
-
-            idbPromise('savedMovies', 'put', movie);
-            idbPromise('moviesToDisplay', 'delete', movie);
-            idbPromise('removedMovies', 'delete', { movieId: movie.movieId });
-
-            // update the movies to display
-            if (movies.length > 1) {
-                const updatedMovies = await movies.slice(1);
-                setMovies(updatedMovies);
-            } else {
-                console.log('no more movies!');
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleRemoveMovie = async (movie) => {
-        try {
-            // update the db
-            const { data } = await removeMovie({
-                variables: { movieId: movie.movieId }
-            });
-
-            if (removeError) {
-                throw new Error('Something went wrong!');
-            }
-
-            // update global state
-            dispatch({
-                type: ADD_TO_REMOVED_MOVIES,
-                movie: movie
-            });
-
-            idbPromise('savedMovies', 'delete', { ...movie });
-            idbPromise('moviesToDisplay', 'delete', { ...movie });
-            idbPromise('removedMovies', 'put', { movieId: movie.movieId });
-
-            // update the movies to display
-            if (movies.length > 1) {
-                const updatedMovies = await movies.slice(1);
-                setMovies(updatedMovies);
-            } else {
-                console.log('no more movies!');
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const handleSkipMovie = async ( ) => {
-        // update the movies to display
-        if (movies.length > 1) {
-            const updatedMovies = await movies.slice(1);
-            updatedMovies.push(displayedMovie);
-            setMovies(updatedMovies); // this isn't working
-        } else {
-            console.log('no more movies!');
-        }
-    };
-
     return(
         <>
-            <Jumbotron fluid className="text-light">
-                <Container>
-                    <h1>Discover new movies below!</h1>
-                    <ul>
-                        <li>Click the thumbs up icon to save a movie and the thumbs down icon to indicate disinterest.</li>
-                        <li>Click the right arrow to skip ahead.</li>
-                        <li>If a trailer is available, you'll see it on the card!</li>
-                    </ul>
+            <Jumbotron fluid className="text-light bg-dark">
+                <Container className="text-center">
+                    <h1>Welcome to FANTINDER!</h1>
+                    {Auth.loggedIn()
+                        ? <h4>Click thumbs up to like and save a movie, thumbs down to pass.</h4>
+                        : <h4>Check out our recommended movies.</h4>
+                    }
                 </Container>
             </Jumbotron>
 
             <Container className="home-movie-container">
-                {displayedMovie
-                    ? <SingleMovieCard
+                {movies[displayedMovieIndex] &&
+                    <SingleMovieCard
+                        movie={movies[displayedMovieIndex]}
                         displayTrailer
-                        displaySkipButton
-                        movie={displayedMovie}
-                        saveMovieHandler={handleSaveMovie}
+                        displaySkip
+                        likeMovieHandler={handleLikeMovie}
+                        dislikeMovieHandler={handleDislikeMovie}
                         skipMovieHandler={handleSkipMovie}
-                        removeMovieHandler={handleRemoveMovie}
-                        disabled={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId)}
-                        btnColor={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId) ? "outline-secondary" : "outline-success" } />
-                    : <h2>No more movies to display! Check back tomorrow.</h2>
+                    />
                 }
             </Container>
         </>
