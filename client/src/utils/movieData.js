@@ -10,13 +10,13 @@ export const cleanMovieData = async (movieData) => {
         const movie = await movies[i]
 
         let cleanedData = {
-            movieId: movie.id,
-            vote: movie.vote_average,
+            externalMovieId: movie.id,
+            rating: movie.vote_average,
             voteCount: movie.vote_count,
-            name: movie.title,
+            title: movie.title,
             overview: movie.overview,
-            release: moment(movie.release).format('LL'),
-            image: 'https://image.tmdb.org/t/p/w500' + movie.poster_path
+            releaseDate: moment(movie.release).format('LL'),
+            poster: 'https://image.tmdb.org/t/p/w500' + movie.poster_path
         }
 
         // try to get the trailer

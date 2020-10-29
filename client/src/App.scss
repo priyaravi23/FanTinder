@@ -1,5 +1,4 @@
 $color-primary : rgb(0, 0, 0);
-$color-secondary: rgb(238, 79, 79);
 $color-light-text: rgb(207, 207, 207);
 $color-dark-text: rgb(63, 63, 63);
 
@@ -23,11 +22,6 @@ body {
   justify-content: center;
 }
 
-.home-container {
-  margin-top: 30vh;
-  max-width: 86%;
-}
-
 .home-text {
   text-align: center;
 }
@@ -35,14 +29,6 @@ body {
 .jumbotron {
   display: flex;
   align-items: center;
-  background-color: $color-secondary;
-}
-
-.search-btn {
-  margin-top: 10px;
-  background: transparent;
-  border: 1px solid $color-secondary;
-  color: $color-secondary;
 }
 
 .card {
@@ -70,11 +56,19 @@ body {
   .card-columns {
     column-count: 1;
   }
+  .home-movie-container > .card-columns {
+    width: 95vw;
+  }
 }
 
 @media (min-width: 768px) {
   .card-columns {
     column-count: 2;
+  }
+  .home-movie-container > .card-columns {
+    column-count: 1;
+    width: 75vw;
+    margin: auto;
   }
 }
 
@@ -82,16 +76,7 @@ body {
   .card-columns {
     column-count: 3;
   }
-}
-
-@media only screen and (max-width: 734px) {
-  .home-container {
-    margin-top: 20vh;
-  }
-}
-
-@media only screen and (max-width: 405px) {
-  .home-text {
-    font-size: 28px;
+  .home-movie-container > .card-columns {
+    width: 50vw;
   }
 }

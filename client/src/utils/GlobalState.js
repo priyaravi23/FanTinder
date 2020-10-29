@@ -6,10 +6,11 @@ const { Provider } = FantinderContext;
 
 const FantinderProvider = ({ value = [], ...props }) => {
     const [state, dispatch] = useMovieReducer({
-      savedMovies: [],
-      removedMovies: [],
-      moviesToDisplay: []
+      likedMovies: [],  // array of movieIds that were liked
+      dislikedMovies: [],  // array of movieIds that were disliked
+      movies: []  // array of Movie docs
     });
+    console.log({state});
     return <Provider value={[state, dispatch]} {...props} />;
   };
 

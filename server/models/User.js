@@ -21,7 +21,7 @@ const userSchema = new Schema(
         friends: [{
             type: Schema.Types.ObjectId,
             ref: 'User',
-        }], 
+        }],
         likedMovies: [{
             type: Schema.Types.ObjectId,
             ref: 'Movie',

@@ -6,8 +6,15 @@ export const GET_USER = gql`
       _id
       username
       email
-      likedMovies
-      dislikedMovies
+      friends {
+        _id
+      }
+      likedMovies{
+        _id
+      }
+      dislikedMovies{
+        _id
+      }
     }
   }
 `;
@@ -15,6 +22,7 @@ export const GET_USER = gql`
 export const GET_MOVIES = gql`
   {
     movies {
+      _id
       externalMovieId
       rating
       voteCount

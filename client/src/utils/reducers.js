@@ -1,44 +1,48 @@
 import { useReducer } from 'react';
 
 import { 
-    ADD_TO_REMOVED_MOVIES,
-    ADD_TO_SAVED_MOVIES,
-    REMOVE_FROM_MOVIES_TO_DISPLAY,
-    UPDATE_MOVIES_TO_DISPLAY,
-    UPDATE_REMOVED_MOVIES,
-    UPDATE_SAVED_MOVIES }
+    ADD_TO_MOVIES,
+    UPDATE_MOVIES,
+    ADD_TO_DISLIKED_MOVIES,
+    UPDATE_DISLIKED_MOVIES,
+    ADD_TO_LIKED_MOVIES,
+    UPDATE_LIKED_MOVIES
+ }
 from '../utils/actions';
 
 export const reducer = (state, action) => {
     switch (action.type) {
-        case ADD_TO_REMOVED_MOVIES:
+        case ADD_TO_MOVIES:
             return {
                 ...state,
-                savedMovies: state.savedMovies.filter(savedMovie => savedMovie.movieId !== action.movie.movieId),
-                moviesToDisplay: state.moviesToDisplay.filter(movieToDisplay => movieToDisplay.movieId !== action.movie.movieId),
-                removedMovies: [...state.removedMovies, action.movie.movieId]
+                movies: [...state.movies, action.movie]
             }
-        case ADD_TO_SAVED_MOVIES:
+        case ADD_TO_LIKED_MOVIES:
             return {
                 ...state,
-                savedMovies: [...state.savedMovies, action.movie],
-                moviesToDisplay: state.moviesToDisplay.filter(movieToDisplay => movieToDisplay.movieId !== action.movie.movieId),
-                removedMovies: state.removedMovies.filter(removedMovieId => removedMovieId !== action.movie.movieId)
+                likedMovies: [...state.likedMovies, action.movieId],
+                dislikedMovies: state.dislikedMovies.filter(dislikedMovieId => dislikedMovieId !== action.movieId),
             }
-        case UPDATE_MOVIES_TO_DISPLAY:
+        case ADD_TO_DISLIKED_MOVIES:
             return {
                 ...state,
-                moviesToDisplay: action.moviesToDisplay
+                likedMovies: state.likedMovies.filter(likedMovieId => likedMovieId !== action.movieId),
+                dislikedMovies: [...state.dislikedMovies, action.movie],
             }
-        case UPDATE_REMOVED_MOVIES:
+        case UPDATE_MOVIES:
             return {
                 ...state,
-                removedMovies: action.removedMovies
+                movies: action.movies
             }
-        case UPDATE_SAVED_MOVIES:
+        case UPDATE_DISLIKED_MOVIES:
             return {
                 ...state,
-                savedMovies: action.savedMovies
+                dislikedMovies: action.dislikedMovies,
+            }
+        case UPDATE_LIKED_MOVIES:
+            return {
+                ...state,
+                likedMovies: action.likedMovies,
             }
         default:
             return state ? state : '';
