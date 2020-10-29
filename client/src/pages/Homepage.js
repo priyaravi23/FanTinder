@@ -36,16 +36,18 @@ const Homepage = () => {
 
                 const { results } = await response.json();
 
-                // filter out IDs that we should skip
+                // only add movies the user hasn't liked/disliked
                 const filteredResults = await results.filter(movie => {
-                    const likedMovie = likedMovies.some(likedMovie => likedMovie._id === movie._id);
-                    const dislikedMovie = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movie._id);
+                    const likedMovie = likedMovies.includes(movie._id);
+                    const dislikedMovie = dislikedMovies.includes(movie._id);
 
                     return !likedMovie && !dislikedMovie
                 })
 
                 // reformat the data
                 const cleanedMovieData = await cleanMovieData(filteredResults);
+
+                // store the data in the db, global state, and idb
                 cleanedMovieData.forEach(async movie => {
                     // add the movie to the db
                     const { data } = await addMovie({
@@ -86,15 +88,10 @@ const Homepage = () => {
                     <h3>Movies trending this week:</h3>
                 </div>
 
-                {movies && 
+                {movies.length &&
                     <MovieCards
                         displayTrailers
-                        moviesToDisplay={movies.filter(movie => {
-                            const likedMovie = likedMovies.some(likedMovie => likedMovie._id === movie._id);
-                            const dislikedMovie = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movie._id);
-        
-                            return !likedMovie && !dislikedMovie
-                        })}
+                        moviesToDisplay={movies}
                     />
                 }
                 <h4 className="text-center p-5 m-5">You've reached the end of our movie list! Check back later for more recommendations.</h4>

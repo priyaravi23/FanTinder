@@ -11,9 +11,25 @@ export const GET_USER = gql`
       }
       likedMovies{
         _id
+        externalMovieId
+        rating
+        voteCount
+        title
+        overview
+        releaseDate
+        poster
+        trailer
       }
       dislikedMovies{
         _id
+        externalMovieId
+        rating
+        voteCount
+        title
+        overview
+        releaseDate
+        poster
+        trailer
       }
     }
   }

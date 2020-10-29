@@ -10,7 +10,7 @@ const FantinderProvider = ({ value = [], ...props }) => {
       dislikedMovies: [],  // array of movieIds that were disliked
       movies: []  // array of Movie docs
     });
-    console.log({state});
+    // console.log({state}); // comment this in to test!
     return <Provider value={[state, dispatch]} {...props} />;
   };
 

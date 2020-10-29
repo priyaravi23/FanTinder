@@ -54,7 +54,7 @@ const SingleMovieCard = (props) => {
                         </>
                     }
                     <Accordion.Toggle className="small" as={Card.Link} variant="link" eventKey={movie._id}>
-                    Click to expand for more details
+                        Click to expand for more details
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey={movie._id}>
                         <Card.Body>
@@ -68,17 +68,21 @@ const SingleMovieCard = (props) => {
                         <Card.Footer className="d-flex justify-content-between">
                             <Button
                                 className="movie-card-button"
-                                disabled={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)}
-                                variant={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id) ? "outline-secondary" : "outline-danger"}
+                                disabled={dislikedMovies?.includes(movie._id)}
+                                variant={dislikedMovies?.includes(movie._id) ? "outline-secondary" : "outline-danger"}
                                 onClick={() => dislikeMovieHandler(movie._id)}>
-                                <i className='far fa-thumbs-down fa-2x' />
+                                    {dislikedMovies?.includes(movie._id)
+                                    ? <span>Disliked!</span>
+                                    : <i className='far fa-thumbs-down fa-2x' />}
                             </Button>
                             <Button
                                 className="movie-card-button"
-                                disabled={likedMovies?.some(likedMovie => likedMovie._id === movie._id)}
-                                variant={likedMovies?.some(likedMovie => likedMovie._id === movie._id) ? "outline-secondary" : "outline-success"}
+                                disabled={likedMovies?.includes(movie._id)}
+                                variant={likedMovies?.includes(movie._id) ? "outline-secondary" : "outline-success"}
                                 onClick={() => likeMovieHandler(movie._id)}>
-                                <i className='far fa-thumbs-up fa-2x' />
+                                    {likedMovies?.includes(movie._id)
+                                    ? <span>Liked!</span>
+                                    : <i className='far fa-thumbs-up fa-2x' />}
                             </Button>
                         </Card.Footer>
                     }

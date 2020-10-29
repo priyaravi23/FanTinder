@@ -35,8 +35,8 @@ const MovieCards = (props) => {
     useEffect(() => {
         if (data && data.me) {
             // get rid of __typename
-            const dislikedMovieIds = data.me.dislikedMovies.map(dislikedMovie => ({_id: dislikedMovie._id }));
-            const likedMovieIds = data.me.likedMovies.map(likedMovie => ({_id: likedMovie._id }));
+            const dislikedMovieIds = data.me.dislikedMovies.map(dislikedMovie => dislikedMovie._id);
+            const likedMovieIds = data.me.likedMovies.map(likedMovie => likedMovie._id);
 
             dispatch({
                 type: UPDATE_DISLIKED_MOVIES,
@@ -86,15 +86,17 @@ const MovieCards = (props) => {
             
             // remove the movie from moviesToDisplay
             const filteredMovies = await movies.filter(movie => movie._id !== likedMovieId);
+            const likedMovieIds = await data.likeMovie.likedMovies.map(movie => movie._id);
+            const dislikedMovieIds = await data.likeMovie.dislikedMovies.map(movie => movie._id);
 
             // update global state
             dispatch({
                 type: UPDATE_LIKED_MOVIES,
-                likedMovies: data.likeMovie.likedMovies
+                likedMovies: likedMovieIds
             });
             dispatch({
                 type: UPDATE_DISLIKED_MOVIES,
-                dislikedMovies: data.likeMovie.dislikedMovies
+                dislikedMovies: dislikedMovieIds
             });
             dispatch({
                 type: UPDATE_MOVIES,
@@ -102,8 +104,8 @@ const MovieCards = (props) => {
             });
 
             // update idb
-            idbPromise('likedMovies', 'put', { _id: likedMovieId });
-            idbPromise('dislikedMovies', 'delete', { _id: likedMovieId });
+            idbPromise('likedMovies', 'put', {_id: likedMovieId });
+            idbPromise('dislikedMovies', 'delete', {_id: likedMovieId});
         } catch (err) {
             console.error(err);
         }
@@ -140,7 +142,7 @@ const MovieCards = (props) => {
 
             // update idb
             idbPromise('dislikedMovies', 'put', { _id: dislikedMovieId });
-            idbPromise('likedMovies', 'delete',  { _id: dislikedMovieId });
+            idbPromise('likedMovies', 'delete', { _id: dislikedMovieId });
         } catch (err) {
             console.error(err);
         }
@@ -151,7 +153,7 @@ const MovieCards = (props) => {
             {moviesToDisplay?.map(movie => {
                 return (
                     <SingleMovieCard
-                        key={movie._id}
+                        key={movie._id} // failing here means that there are duplicate movies in the global state.
                         displayTrailer={displayTrailers}
                         movie={movie}
                         likeMovieHandler={handleLikeMovie}

@@ -7,21 +7,14 @@ import { searchTMDB } from '../utils/API';
 import { ADD_MOVIE } from '../utils/mutations';
 import { useMutation } from '@apollo/react-hooks';
 
-// import GlobalState dependencies
-import { useFantinderContext } from "../utils/GlobalState";
-import { ADD_TO_MOVIES } from '../utils/actions';
-
 // import react-bootstrap components
 import { Form, Button, Container, Jumbotron } from 'react-bootstrap';
 
 // import custom components
 import MovieCards from '../components/MovieCards'
-import { idbPromise } from "../utils/helpers";
 import { cleanMovieData } from '../utils/movieData';
 
 const SearchMovies = () => {
-    const [state, dispatch] = useFantinderContext();
-    const { movies } = state;
     const [searchInput, setSearchInput] = useState('');
     const [noResultsFound, setNoResultsFound] = useState(false);
     const [searchedMovies, setSearchedMovies] = useState([]);
@@ -47,20 +40,19 @@ const SearchMovies = () => {
             setNoResultsFound(true);
         }
         const cleanedMovies = await cleanMovieData(results);
-        const updatedSearchedMovies = [];
-        cleanedMovies.forEach(movie => {
-            //  add or update the movie in the db
+        let movieData = [];
+        for (let i=0; i < cleanedMovies.length; i++) {
             addMovie({
-                variables: { input: movie }
+                variables: { input: cleanedMovies[i] }
             })
             .then(({ data }) => {
                 if (!addMovieError) {
-                    const newMovie = data.addMovie;
-                    updatedSearchedMovies.push(newMovie);
+                    movieData.push(data.addMovie);
                 }
-            }).catch(err => console.error(err))
-        });
-        setSearchedMovies(updatedSearchedMovies)
+            })
+            .catch(err => console.error(err));
+        };
+        setSearchedMovies(movieData);
     };
 
     return (
