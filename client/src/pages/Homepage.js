@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 // import TMDB API dependencies
 import { getTrendingMovies } from '../utils/API';
@@ -70,7 +70,7 @@ const Homepage = () => {
             }
             fetchData();
         }
-    }, [movies, dispatch]);
+    }, [movies.length, dispatch, addMovie, addMovieError, dislikedMovies, likedMovies]);
 
     return(
         <>

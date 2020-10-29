@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 // import bootstrap-react components
 import { Accordion, Button, Card, ResponsiveEmbed } from 'react-bootstrap';
@@ -9,7 +9,7 @@ import Auth from '../utils/auth';
 import { useFantinderContext } from "../utils/GlobalState";
 
 const SingleMovieCard = (props) => {
-    const [state, dispatch] = useFantinderContext();
+    const [state, ] = useFantinderContext();
     const { likedMovies, dislikedMovies } = state;
     const {
         movie,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 // Components
 import { Jumbotron, Container } from 'react-bootstrap';
 import MovieCards from '../components/MovieCards';
@@ -43,7 +43,7 @@ const SavedMovies = () => {
                 });
             });
         }
-    }, [data, loading, dispatch]);
+    }, [data, loading, dispatch, movies.length]);
 
     return (
         <>
