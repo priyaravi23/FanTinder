@@ -75,16 +75,17 @@ const Homepage = () => {
     return(
         <>
             <Jumbotron fluid className="text-light bg-dark">
-                <Container>
-                    <h1>Discover new movies below!</h1>
-                    <ul>
-                        <li>If you're logged in, click thumbs up to save a movie profile and thumbs down to remove it from the queue.</li>
-                        <li>If a trailer is available, you'll see it on the card!</li>
-                    </ul>   
+                <Container className="text-center">
+                    <h1>Welcome to FANTINDER!</h1>
+
                 </Container>
             </Jumbotron>
 
             <Container className="home-movie-container">
+                <div className="pb-5">
+                    <h3>Movies trending this week:</h3>
+                </div>
+
                 {movies && 
                     <MovieCards
                         displayTrailers
@@ -96,6 +97,7 @@ const Homepage = () => {
                         })}
                     />
                 }
+                <h4 className="text-center p-5 m-5">You've reached the end of our movie list! Check back later for more recommendations.</h4>
             </Container>
         </>
     );

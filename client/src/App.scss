@@ -1,6 +1,15 @@
-$color-primary : rgb(0, 0, 0);
+$color-primary : rgb(13,14,14);
 $color-light-text: rgb(207, 207, 207);
 $color-dark-text: rgb(63, 63, 63);
+
+.app-container {
+  position: relative;
+  min-height: 150vh;
+}
+
+.app-content {
+  padding-bottom: 200px;
+}
 
 body {
   font-family: 'Rubik', sans-serif;
@@ -50,6 +59,18 @@ body {
 .small {
   font-weight: 300;
   font-style: italic;
+}
+
+.no-bullets {
+  list-style: none;
+}
+
+.page-footer {
+  height: 200px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #333435;
 }
 
 @media (min-width: 576px) {
