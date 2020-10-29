@@ -77,7 +77,7 @@ body {
   .card-columns {
     column-count: 1;
   }
-  .home-movie-container > .card-columns {
+  .home-movie-container {
     width: 95vw;
   }
 }
@@ -86,7 +86,7 @@ body {
   .card-columns {
     column-count: 2;
   }
-  .home-movie-container > .card-columns {
+  .home-movie-container {
     column-count: 1;
     width: 75vw;
     margin: auto;
@@ -97,7 +97,7 @@ body {
   .card-columns {
     column-count: 3;
   }
-  .home-movie-container > .card-columns {
+  .home-movie-container {
     width: 50vw;
   }
 }

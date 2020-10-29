@@ -15,7 +15,8 @@ const SingleMovieCard = (props) => {
         movie,
         displayTrailer,
         likeMovieHandler,
-        dislikeMovieHandler
+        dislikeMovieHandler,
+        skipMovieHandler
     } = props;
 
     return (
@@ -64,7 +65,8 @@ const SingleMovieCard = (props) => {
                         </Card.Body>
                     </Accordion.Collapse>
                 </Card.Body>
-                    {Auth.loggedIn() &&
+                    {Auth.loggedIn()
+                    ?   
                         <Card.Footer className="d-flex justify-content-between">
                             <Button
                                 className="movie-card-button"
@@ -83,6 +85,14 @@ const SingleMovieCard = (props) => {
                                     {likedMovies?.includes(movie._id)
                                     ? <span>Liked!</span>
                                     : <i className='far fa-thumbs-up fa-2x' />}
+                            </Button>
+                        </Card.Footer>
+                    : 
+                        <Card.Footer className="text-center">
+                            <Button
+                                className="movie-card-button"
+                                onClick={() => skipMovieHandler(movie._id)}>
+                                    Next Movie
                             </Button>
                         </Card.Footer>
                     }

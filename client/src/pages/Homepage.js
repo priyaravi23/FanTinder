@@ -1,27 +1,40 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // import TMDB API dependencies
 import { getTrendingMovies } from '../utils/API';
 
 // import GraphQL Dependencies
-import { ADD_MOVIE } from '../utils/mutations';
+import { DISLIKE_MOVIE, LIKE_MOVIE, ADD_MOVIE } from '../utils/mutations';
 import { useMutation } from '@apollo/react-hooks';
 
 // import GlobalState dependencies
 import { useFantinderContext } from "../utils/GlobalState";
-import { ADD_TO_MOVIES } from '../utils/actions';
+import {
+    ADD_TO_MOVIES,
+    UPDATE_DISLIKED_MOVIES,
+    UPDATE_LIKED_MOVIES,
+    UPDATE_MOVIES
+} from '../utils/actions';
 
 // import components
 import { Container, Jumbotron } from 'react-bootstrap';
-import MovieCards from '../components/MovieCards';
+import SingleMovieCard from '../components/SingleMovieCard';
 
 // import indexedDB dependencies
 import { idbPromise } from "../utils/helpers";
 import { cleanMovieData } from '../utils/movieData';
 
+import Auth from '../utils/auth';
+
 const Homepage = () => {
     const [state, dispatch] = useFantinderContext();
     const { movies, likedMovies, dislikedMovies } = state
+
+    const [displayedMovie, setDisplayedMovie] = useState('');
+    const [displayedMovieIndex, setDisplayedMovieIndex] = useState('');
+
+    const [dislikeMovie, { dislikeError }] = useMutation(DISLIKE_MOVIE);
+    const [likeMovie, { likeError }] = useMutation(LIKE_MOVIE);
     const [addMovie, { addMovieError }] = useMutation(ADD_MOVIE);
 
     useEffect(() => {
@@ -35,17 +48,9 @@ const Homepage = () => {
                 }
 
                 const { results } = await response.json();
-
-                // only add movies the user hasn't liked/disliked
-                const filteredResults = await results.filter(movie => {
-                    const likedMovie = likedMovies.includes(movie._id);
-                    const dislikedMovie = dislikedMovies.includes(movie._id);
-
-                    return !likedMovie && !dislikedMovie
-                })
-
+        
                 // reformat the data
-                const cleanedMovieData = await cleanMovieData(filteredResults);
+                const cleanedMovieData = await cleanMovieData(results);
 
                 // store the data in the db, global state, and idb
                 cleanedMovieData.forEach(async movie => {
@@ -74,27 +79,173 @@ const Homepage = () => {
         }
     }, [movies.length, dispatch, addMovie, addMovieError, dislikedMovies, likedMovies]);
 
+    useEffect(() => {
+        // if there's no displayedMovie, we need to set it.
+        if (!displayedMovie && movies.length) {
+
+            // figure out where to start iterating
+            const startIndex = displayedMovieIndex ? displayedMovieIndex + 1: 0;
+
+            // set the displayedMovie to the first movie in movies that has not been liked or disliked
+            for (let i = startIndex; i < movies.length; i++) {
+                let movieToTest = movies[i];
+
+                const likedMovie = likedMovies.includes(movieToTest._id);
+                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+                // stop iterating as soon as there's a match
+                if (!likedMovie && !dislikedMovie) {
+                    setDisplayedMovieIndex(i);
+                    break;
+                }
+            }
+        }
+
+    }, [displayedMovie, setDisplayedMovieIndex, movies.length])
+
+
+    const handleLikeMovie = async (likedMovieId) => {
+        try {
+            // update the db
+            let { data } = await likeMovie({
+                variables: { movieId: likedMovieId }
+            });
+
+            // throw an error if the mutation failed
+            if (likeError) {
+                throw new Error('Something went wrong!');
+            }
+            
+            // remove the movie from moviesToDisplay
+            const filteredMovies = await movies.filter(movie => movie._id !== likedMovieId);
+            const likedMovieIds = await data.likeMovie.likedMovies.map(movie => movie._id);
+            const dislikedMovieIds = await data.likeMovie.dislikedMovies.map(movie => movie._id);
+
+            // update global state
+            dispatch({
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: likedMovieIds
+            });
+            dispatch({
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: dislikedMovieIds
+            });
+            dispatch({
+                type: UPDATE_MOVIES,
+                movies: filteredMovies
+            });
+
+            // update idb
+            idbPromise('likedMovies', 'put', {_id: likedMovieId });
+            idbPromise('dislikedMovies', 'delete', {_id: likedMovieId});
+
+            // update movie displayed
+            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
+                let movieToTest = movies[i];
+
+                const likedMovie = likedMovie.includes(movieToTest._id);
+                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+                // stop iterating as soon as there's a match
+                if (!likedMovie && !dislikedMovie) {
+                    setDisplayedMovieIndex(i);
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleDislikeMovie = async (dislikedMovieId) => {
+        try {
+            // update the db
+            let { data } = await dislikeMovie({
+                variables: { movieId: dislikedMovieId }
+            });
+
+            // throw an error if the mutation failed
+            if (dislikeError) {
+                throw new Error('Something went wrong!');
+            }
+            
+            // remove the movie from moviesToDisplay
+            const filteredMovies = await movies.filter(movie => movie._id !== dislikedMovieId);
+
+            // update global state
+            dispatch({
+                type: UPDATE_LIKED_MOVIES,
+                likedMovies: data.dislikeMovie.likedMovies
+            });
+            dispatch({
+                type: UPDATE_DISLIKED_MOVIES,
+                dislikedMovies: data.dislikeMovie.dislikedMovies
+            });
+            dispatch({
+                type: UPDATE_MOVIES,
+                movies: filteredMovies
+            });
+
+            // update idb
+            idbPromise('dislikedMovies', 'put', { _id: dislikedMovieId });
+            idbPromise('likedMovies', 'delete', { _id: dislikedMovieId });
+
+            // update movie displayed
+            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
+                let movieToTest = movies[i];
+
+                const likedMovie = likedMovie.includes(movieToTest._id);
+                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+                // stop iterating as soon as there's a match
+                if (!likedMovie && !dislikedMovie) {
+                    setDisplayedMovieIndex(i);
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleSkipMovie = () => {
+        // update movie displayed
+        for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
+            let movieToTest = movies[i];
+
+            const likedMovie = likedMovies.includes(movieToTest._id);
+            const dislikedMovie = dislikedMovies.includes(movieToTest._id);
+
+            // stop iterating as soon as there's a match
+            if (!likedMovie && !dislikedMovie) {
+                setDisplayedMovieIndex(i);
+                break;
+            }
+        }
+    }
+    
     return(
         <>
             <Jumbotron fluid className="text-light bg-dark">
                 <Container className="text-center">
                     <h1>Welcome to FANTINDER!</h1>
-
+                    {Auth.loggedIn()
+                        ? <h4>Click thumbs up to like and save a movie, thumbs down to pass.</h4>
+                        : <h4>Check out our recommended movies.</h4>
+                    }
                 </Container>
             </Jumbotron>
 
             <Container className="home-movie-container">
-                <div className="pb-5">
-                    <h3>Movies trending this week:</h3>
-                </div>
-
-                {movies.length &&
-                    <MovieCards
-                        displayTrailers
-                        moviesToDisplay={movies}
+                {movies[displayedMovieIndex] &&
+                    <SingleMovieCard
+                        movie={movies[displayedMovieIndex]}
+                        displayTrailer
+                        likeMovieHandler={handleLikeMovie}
+                        dislikeMovieHandler={handleDislikeMovie}
+                        skipMovieHandler={handleSkipMovie}
                     />
                 }
-                <h4 className="text-center p-5 m-5">You've reached the end of our movie list! Check back later for more recommendations.</h4>
             </Container>
         </>
     );

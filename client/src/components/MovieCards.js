@@ -83,9 +83,7 @@ const MovieCards = (props) => {
             if (likeError) {
                 throw new Error('Something went wrong!');
             }
-            
-            // remove the movie from moviesToDisplay
-            const filteredMovies = await movies.filter(movie => movie._id !== likedMovieId);
+
             const likedMovieIds = await data.likeMovie.likedMovies.map(movie => movie._id);
             const dislikedMovieIds = await data.likeMovie.dislikedMovies.map(movie => movie._id);
 
@@ -97,10 +95,6 @@ const MovieCards = (props) => {
             dispatch({
                 type: UPDATE_DISLIKED_MOVIES,
                 dislikedMovies: dislikedMovieIds
-            });
-            dispatch({
-                type: UPDATE_MOVIES,
-                movies: filteredMovies
             });
 
             // update idb
@@ -122,22 +116,18 @@ const MovieCards = (props) => {
             if (dislikeError) {
                 throw new Error('Something went wrong!');
             }
-            
-            // remove the movie from moviesToDisplay
-            const filteredMovies = await movies.filter(movie => movie._id !== dislikedMovieId);
+
+            const likedMovieIds = await data.dislikeMovie.likedMovies.map(movie => movie._id);
+            const dislikedMovieIds = await data.dislikeMovie.dislikedMovies.map(movie => movie._id);
 
             // update global state
             dispatch({
                 type: UPDATE_LIKED_MOVIES,
-                likedMovies: data.dislikeMovie.likedMovies
+                likedMovies: likedMovieIds
             });
             dispatch({
                 type: UPDATE_DISLIKED_MOVIES,
-                dislikedMovies: data.dislikeMovie.dislikedMovies
-            });
-            dispatch({
-                type: UPDATE_MOVIES,
-                movies: filteredMovies
+                dislikedMovies: dislikedMovieIds
             });
 
             // update idb
@@ -153,7 +143,7 @@ const MovieCards = (props) => {
             {moviesToDisplay?.map(movie => {
                 return (
                     <SingleMovieCard
-                        key={movie._id} // failing here means that there are duplicate movies in the global state.
+                        key={movie.externalMovieId} // failing here means that there are duplicate movies in the global state.
                         displayTrailer={displayTrailers}
                         movie={movie}
                         likeMovieHandler={handleLikeMovie}
