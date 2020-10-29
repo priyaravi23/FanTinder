@@ -20,7 +20,8 @@ import { idbPromise } from "../utils/helpers";
 import { cleanMovieData } from '../utils/movieData';
 
 const SearchMovies = () => {
-    const [, dispatch] = useFantinderContext();
+    const [state, dispatch] = useFantinderContext();
+    const { movies } = state;
     const [searchInput, setSearchInput] = useState('');
     const [noResultsFound, setNoResultsFound] = useState(false);
     const [searchedMovies, setSearchedMovies] = useState([]);
@@ -33,48 +34,33 @@ const SearchMovies = () => {
             return false;
         }
 
-        searchTMDB(searchInput).then(res => {
-            if (res.ok) {
-                res.json()
-                .then(async ({ results }) => {
-                    if (results.length === 0) {
-                        setNoResultsFound(true);
-                    } else {
-                        setNoResultsFound(false);
-                        const cleanedMovies = await cleanMovieData(results);
+        const response = await searchTMDB(searchInput);
+        
+        if (!response.ok) {
+            throw new Error("Couldn't search for movies");
+        }
 
-                        const updatedSearchedMovies = [];
-
-                        cleanedMovies.forEach(movie => {
-                            //  add the movie to the db
-                            return addMovie({
-                                variables: { input: movie }
-                            })
-                            .then(({ data }) => {
-                                if (!addMovieError) {
-                                    const newMovie = data.addMovie;
-
-                                    updatedSearchedMovies.push(newMovie);
-
-                                    // update movies in global state
-                                    dispatch({
-                                        type: ADD_TO_MOVIES,
-                                        movies: newMovie
-                                    })
-
-                                    // update movies in idb
-                                    idbPromise('movies', 'put', newMovie);
-                                }
-                            })
-                            .catch(err => console.error(err))
-                        })
-                        setSearchedMovies(updatedSearchedMovies);
-                    }
-                })
-            } else {
-                console.error(res.text);
-            }
-        }).catch(err => console.error(err));
+        const { results } = await response.json();
+        if (results.length > 0) {
+            setNoResultsFound(false);
+        } else {
+            setNoResultsFound(true);
+        }
+        const cleanedMovies = await cleanMovieData(results);
+        const updatedSearchedMovies = [];
+        cleanedMovies.forEach(movie => {
+            //  add or update the movie in the db
+            addMovie({
+                variables: { input: movie }
+            })
+            .then(({ data }) => {
+                if (!addMovieError) {
+                    const newMovie = data.addMovie;
+                    updatedSearchedMovies.push(newMovie);
+                }
+            }).catch(err => console.error(err))
+        });
+        setSearchedMovies(updatedSearchedMovies)
     };
 
     return (
