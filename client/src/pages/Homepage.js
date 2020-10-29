@@ -241,6 +241,7 @@ const Homepage = () => {
                     <SingleMovieCard
                         movie={movies[displayedMovieIndex]}
                         displayTrailer
+                        displaySkip
                         likeMovieHandler={handleLikeMovie}
                         dislikeMovieHandler={handleDislikeMovie}
                         skipMovieHandler={handleSkipMovie}
