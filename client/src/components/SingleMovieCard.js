@@ -16,7 +16,8 @@ const SingleMovieCard = (props) => {
         displayTrailer,
         likeMovieHandler,
         dislikeMovieHandler,
-        skipMovieHandler
+        skipMovieHandler,
+        displaySkip
     } = props;
 
     return (
@@ -83,7 +84,7 @@ const SingleMovieCard = (props) => {
                                     : <i className='far fa-thumbs-up fa-2x' />}
                             </Button>
                         </Card.Footer>
-                    : 
+                    : displaySkip &&
                         <Card.Footer className="text-center">
                             <Button
                                 className="movie-card-button"
