@@ -140,18 +140,8 @@ const Homepage = () => {
             idbPromise('dislikedMovies', 'delete', {_id: likedMovieId});
 
             // update movie displayed
-            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
-                let movieToTest = movies[i];
-
-                const likedMovie = likedMovies.includes(movieToTest._id);
-                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
-
-                // stop iterating as soon as there's a match
-                if (!likedMovie && !dislikedMovie) {
-                    setDisplayedMovieIndex(i);
-                    break;
-                }
-            }
+            setDisplayedMovieIndex(displayedMovieIndex + 1);
+            setDisplayedMovie(movies[displayedMovieIndex]);
         } catch (err) {
             console.error(err);
         }
@@ -190,19 +180,9 @@ const Homepage = () => {
             idbPromise('dislikedMovies', 'put', { _id: dislikedMovieId });
             idbPromise('likedMovies', 'delete', { _id: dislikedMovieId });
 
-            // update movie displayed
-            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
-                let movieToTest = movies[i];
-
-                const likedMovie = likedMovies.includes(movieToTest._id);
-                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
-
-                // stop iterating as soon as there's a match
-                if (!likedMovie && !dislikedMovie) {
-                    setDisplayedMovieIndex(i);
-                    break;
-                }
-            }
+            // update the displayed movie
+            setDisplayedMovieIndex(displayedMovieIndex + 1);
+            setDisplayedMovie(movies[displayedMovieIndex]);
         } catch (err) {
             console.error(err);
         }
@@ -210,18 +190,8 @@ const Homepage = () => {
 
     const handleSkipMovie = () => {
         // update movie displayed
-        for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
-            let movieToTest = movies[i];
-
-            const likedMovie = likedMovies.includes(movieToTest._id);
-            const dislikedMovie = dislikedMovies.includes(movieToTest._id);
-
-            // stop iterating as soon as there's a match
-            if (!likedMovie && !dislikedMovie) {
-                setDisplayedMovieIndex(i);
-                break;
-            }
-        }
+        setDisplayedMovieIndex(displayedMovieIndex + 1);
+        setDisplayedMovie(movies[displayedMovieIndex]);
     }
     
     return(
