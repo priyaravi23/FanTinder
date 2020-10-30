@@ -101,7 +101,7 @@ const Homepage = () => {
             }
         }
 
-    }, [displayedMovie, setDisplayedMovieIndex, movies.length])
+    }, [displayedMovie, setDisplayedMovieIndex, movies.length, dislikedMovies, displayedMovieIndex, likedMovies, movies])
 
 
     const handleLikeMovie = async (likedMovieId) => {
@@ -140,18 +140,8 @@ const Homepage = () => {
             idbPromise('dislikedMovies', 'delete', {_id: likedMovieId});
 
             // update movie displayed
-            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
-                let movieToTest = movies[i];
-
-                const likedMovie = likedMovie.includes(movieToTest._id);
-                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
-
-                // stop iterating as soon as there's a match
-                if (!likedMovie && !dislikedMovie) {
-                    setDisplayedMovieIndex(i);
-                    break;
-                }
-            }
+            setDisplayedMovieIndex(displayedMovieIndex + 1);
+            setDisplayedMovie(movies[displayedMovieIndex]);
         } catch (err) {
             console.error(err);
         }
@@ -190,19 +180,9 @@ const Homepage = () => {
             idbPromise('dislikedMovies', 'put', { _id: dislikedMovieId });
             idbPromise('likedMovies', 'delete', { _id: dislikedMovieId });
 
-            // update movie displayed
-            for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
-                let movieToTest = movies[i];
-
-                const likedMovie = likedMovie.includes(movieToTest._id);
-                const dislikedMovie = dislikedMovies.includes(movieToTest._id);
-
-                // stop iterating as soon as there's a match
-                if (!likedMovie && !dislikedMovie) {
-                    setDisplayedMovieIndex(i);
-                    break;
-                }
-            }
+            // update the displayed movie
+            setDisplayedMovieIndex(displayedMovieIndex + 1);
+            setDisplayedMovie(movies[displayedMovieIndex]);
         } catch (err) {
             console.error(err);
         }
@@ -210,33 +190,23 @@ const Homepage = () => {
 
     const handleSkipMovie = () => {
         // update movie displayed
-        for (let i = displayedMovieIndex + 1; i < movies.length; i++) {
-            let movieToTest = movies[i];
-
-            const likedMovie = likedMovies.includes(movieToTest._id);
-            const dislikedMovie = dislikedMovies.includes(movieToTest._id);
-
-            // stop iterating as soon as there's a match
-            if (!likedMovie && !dislikedMovie) {
-                setDisplayedMovieIndex(i);
-                break;
-            }
-        }
+        setDisplayedMovieIndex(displayedMovieIndex + 1);
+        setDisplayedMovie(movies[displayedMovieIndex]);
     }
     
     return(
         <>
             <Jumbotron fluid className="text-light bg-dark">
-                <Container className="text-center">
+                <Container>
                     <h1>Welcome to FANTINDER!</h1>
                     {Auth.loggedIn()
                         ? <h4>Click thumbs up to like and save a movie, thumbs down to pass.</h4>
-                        : <h4>Check out our recommended movies.</h4>
+                        : <h4>Check out our recommended movies below.</h4>
                     }
                 </Container>
             </Jumbotron>
 
-            <Container className="home-movie-container">
+            <Container>
                 {movies[displayedMovieIndex] &&
                     <SingleMovieCard
                         movie={movies[displayedMovieIndex]}

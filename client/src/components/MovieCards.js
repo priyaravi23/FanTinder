@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // import react-bootstrap components
 import { CardColumns } from 'react-bootstrap';
@@ -15,23 +15,29 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useFantinderContext } from "../utils/GlobalState";
 import {
     UPDATE_DISLIKED_MOVIES,
-    UPDATE_LIKED_MOVIES,
-    UPDATE_MOVIES
+    UPDATE_LIKED_MOVIES
 } from '../utils/actions';
 
 // import indexedDB dependencies
 import { idbPromise } from "../utils/helpers";
 
 const MovieCards = (props) => {
-    const [state, dispatch] = useFantinderContext();
-    const { movies } = state;
+    const [, dispatch] = useFantinderContext();
+    const [displayedMovies, setDisplayedMovies] = useState([]);
     const [dislikeMovie, { dislikeError }] = useMutation(DISLIKE_MOVIE);
     const [likeMovie, { likeError }] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
 
-    let { moviesToDisplay, displayTrailers } = props;
+    const { moviesToDisplay, displayTrailers, removeMoviesOnDislike } = props;
 
-    // get the movie preferences for the current user
+    // update the movies to displayf
+    useEffect(() => {
+        if (moviesToDisplay.length) {
+            setDisplayedMovies(moviesToDisplay);
+        }
+    }, [moviesToDisplay, setDisplayedMovies])
+
+    // get the movie preferences for the current user to handle like/dislike functionality
     useEffect(() => {
         if (data && data.me) {
             // get rid of __typename
@@ -133,6 +139,12 @@ const MovieCards = (props) => {
             // update idb
             idbPromise('dislikedMovies', 'put', { _id: dislikedMovieId });
             idbPromise('likedMovies', 'delete', { _id: dislikedMovieId });
+
+            if (removeMoviesOnDislike) {
+                // remove the movie from moviesToDisplay
+                const filteredMovies = moviesToDisplay.filter(movie => movie._id !== dislikedMovieId)
+                setDisplayedMovies(filteredMovies);
+            }
         } catch (err) {
             console.error(err);
         }
@@ -140,10 +152,10 @@ const MovieCards = (props) => {
 
     return (
         <CardColumns>
-            {moviesToDisplay?.map(movie => {
+            {displayedMovies?.map(movie => {
                 return (
                     <SingleMovieCard
-                        key={movie.externalMovieId} // failing here means that there are duplicate movies in the global state.
+                        key={movie.movie_id}
                         displayTrailer={displayTrailers}
                         movie={movie}
                         likeMovieHandler={handleLikeMovie}

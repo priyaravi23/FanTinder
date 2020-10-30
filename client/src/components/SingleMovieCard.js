@@ -16,7 +16,8 @@ const SingleMovieCard = (props) => {
         displayTrailer,
         likeMovieHandler,
         dislikeMovieHandler,
-        skipMovieHandler
+        skipMovieHandler,
+        displaySkip
     } = props;
 
     return (
@@ -39,29 +40,25 @@ const SingleMovieCard = (props) => {
                     <Card.Title>
                       {movie.title}
                     </Card.Title>
-                    {movie.rating &&
-                        <>
-                            <StarRatings
+                        <StarRatings
                             rating={movie.rating/2}
                             numberOfStars={5}
                             name={`${movie._id}-rating`}
                             starDimension="20px"
                             starSpacing="1px"
-                            />
+                        />
 
-                            <Card.Text className='small'>
-                                ({movie.voteCount?.toLocaleString()} ratings)
-                            </Card.Text>
-                        </>
-                    }
+                        <Card.Text className='small'>
+                            ({movie.voteCount?.toLocaleString()} ratings)
+                        </Card.Text>
                     <Accordion.Toggle className="small" as={Card.Link} variant="link" eventKey={movie._id}>
                         Click to expand for more details
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey={movie._id}>
                         <Card.Body>
-                        <Card.Text>Plot Summary</Card.Text>
-                        <Card.Text className='small'>{movie.overview}</Card.Text>
-                        <Card.Text className='small'>Release Date: {movie.releaseDate}</Card.Text>
+                            <Card.Text>Plot Summary</Card.Text>
+                            <Card.Text className='small'>{movie.overview}</Card.Text>
+                            <Card.Text className='small'>Release Date: {movie.releaseDate}</Card.Text>
                         </Card.Body>
                     </Accordion.Collapse>
                 </Card.Body>
@@ -87,10 +84,11 @@ const SingleMovieCard = (props) => {
                                     : <i className='far fa-thumbs-up fa-2x' />}
                             </Button>
                         </Card.Footer>
-                    : 
+                    : displaySkip &&
                         <Card.Footer className="text-center">
                             <Button
                                 className="movie-card-button"
+                                size="lg"
                                 onClick={() => skipMovieHandler(movie._id)}>
                                     Next Movie
                             </Button>

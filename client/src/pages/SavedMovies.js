@@ -31,6 +31,7 @@ const SavedMovies = () => {
                 // update idb likedMovies
                 likedMovieIds.forEach(likedMovieId => {
                     idbPromise('likedMovies', 'put', { _id: likedMovieId })
+                    idbPromise('dislikedMovies', 'delete', { _id: likedMovieId })
                 })
 
                 // update local state
@@ -67,7 +68,8 @@ const SavedMovies = () => {
                             <h2>{`Viewing ${likedMovies.length} saved ${likedMovies.length === 1 ? 'movie' : 'movies'}:`}</h2>
                             <MovieCards
                                 moviesToDisplay={likedMovies}
-                                displayTrailers />
+                                displayTrailers
+                                removeMoviesOnDislike />
                         </>
                     :   <h2>You have no saved movies!</h2>
                 }
