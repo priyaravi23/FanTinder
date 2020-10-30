@@ -1,14 +1,15 @@
-$color-primary : rgb(13,14,14);
+$color-primary : #26282b;
+$color-lighter-grey-background: #353941;
 $color-light-text: rgb(207, 207, 207);
+$color-medium-text: #9C9EA1;
 $color-dark-text: rgb(63, 63, 63);
+$color-action: #5f85db;
+$color-action-hover: #90b8f8;
 
 .app-container {
+  margin-bottom: 8em;
   position: relative;
-  min-height: 150vh;
-}
-
-.app-content {
-  padding-bottom: 200px;
+  min-height: 100vh;
 }
 
 body {
@@ -33,11 +34,6 @@ body {
 
 .home-text {
   text-align: center;
-}
-
-.jumbotron {
-  display: flex;
-  align-items: center;
 }
 
 .card {
@@ -66,19 +62,20 @@ body {
 }
 
 .page-footer {
-  height: 200px;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background-color: #333435;
+  background-color: $color-lighter-grey-background;
+}
+
+.footer-link {
+  color: $color-light-text;
+  font-size: 0.8rem;
+}
+.footer-link:hover {
+  color: $color-medium-text;
 }
 
 @media (min-width: 576px) {
   .card-columns {
     column-count: 1;
-  }
-  .home-movie-container {
-    width: 95vw;
   }
 }
 
@@ -86,18 +83,10 @@ body {
   .card-columns {
     column-count: 2;
   }
-  .home-movie-container {
-    column-count: 1;
-    width: 75vw;
-    margin: auto;
-  }
 }
 
 @media (min-width: 992px) {
   .card-columns {
     column-count: 3;
-  }
-  .home-movie-container {
-    width: 50vw;
   }
 }
