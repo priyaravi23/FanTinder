@@ -15,16 +15,14 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useFantinderContext } from "../utils/GlobalState";
 import {
     UPDATE_DISLIKED_MOVIES,
-    UPDATE_LIKED_MOVIES,
-    UPDATE_MOVIES
+    UPDATE_LIKED_MOVIES
 } from '../utils/actions';
 
 // import indexedDB dependencies
 import { idbPromise } from "../utils/helpers";
 
 const MovieCards = (props) => {
-    const [state, dispatch] = useFantinderContext();
-    const { movies } = state;
+    const [, dispatch] = useFantinderContext();
     const [dislikeMovie, { dislikeError }] = useMutation(DISLIKE_MOVIE);
     const [likeMovie, { likeError }] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
@@ -143,7 +141,7 @@ const MovieCards = (props) => {
             {moviesToDisplay?.map(movie => {
                 return (
                     <SingleMovieCard
-                        key={movie.externalMovieId} // failing here means that there are duplicate movies in the global state.
+                        key={movie.movie_id}
                         displayTrailer={displayTrailers}
                         movie={movie}
                         likeMovieHandler={handleLikeMovie}
