@@ -18,10 +18,12 @@ const SearchMovies = () => {
     const [searchInput, setSearchInput] = useState('');
     const [noResultsFound, setNoResultsFound] = useState(false);
     const [searchedMovies, setSearchedMovies] = useState([]);
+    const [searching, setSearching] = useState(false);
     const [addMovie, { addMovieError }] = useMutation(ADD_MOVIE);
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
+        setSearching(true);
 
         if (!searchInput) {
             return false;
@@ -40,19 +42,23 @@ const SearchMovies = () => {
             setNoResultsFound(true);
         }
         const cleanedMovies = await cleanMovieData(results);
-        let movieData = [];
+
+        const updatedSearchedMovies = searchedMovies;
         for (let i=0; i < cleanedMovies.length; i++) {
-            addMovie({
+
+            // add the movie to the DB
+            const { data } = await addMovie({
                 variables: { input: cleanedMovies[i] }
             })
-            .then(({ data }) => {
-                if (!addMovieError) {
-                    movieData.push(data.addMovie);
-                }
-            })
-            .catch(err => console.error(err));
+
+            // update searchedMovies state
+            if (!addMovieError) {
+                updatedSearchedMovies.push(data.addMovie);
+            }
         };
-        setSearchedMovies(movieData);
+        setSearchedMovies(updatedSearchedMovies);
+        setSearching(false);
+
     };
 
     return (
@@ -78,7 +84,7 @@ const SearchMovies = () => {
                 </Container>
             </Jumbotron>
             <Container>
-                {searchedMovies &&
+                {searchedMovies && !searching &&
                     <>
                         <h2 className="results-heading">
                             {searchedMovies.length > 0 && `Viewing ${searchedMovies.length} results:`}
