@@ -16,6 +16,8 @@ const typeDefs = gql`
         releaseDate: String
         poster: String
         trailer: String
+        likedUsers: [User]
+        dislikedUsers: [User]
     }
 
     type User {
@@ -52,7 +54,6 @@ const typeDefs = gql`
         addUser(username: String!, email: String!, password: String!): Auth
         addFriend(friendId: ID!): User
         addMovie(input: MovieInput!): Movie
-        addMovies(input: [MovieInput!]): Boolean
         likeMovie(movieId: ID!): User
         dislikeMovie(movieId: ID!): User
     }

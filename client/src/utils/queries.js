@@ -19,6 +19,14 @@ export const GET_USER = gql`
         releaseDate
         poster
         trailer
+        likedUsers {
+          _id
+          username
+        }
+        dislikedUsers {
+          _id
+          username
+        }
       }
       dislikedMovies{
         _id
@@ -30,23 +38,15 @@ export const GET_USER = gql`
         releaseDate
         poster
         trailer
+        likedUsers {
+          _id
+          username
+        }
+        dislikedUsers {
+          _id
+          username
+        }
       }
-    }
-  }
-`;
-
-export const GET_MOVIES = gql`
-  {
-    movies {
-      _id
-      externalMovieId
-      rating
-      voteCount
-      title
-      overview
-      releaseDate
-      poster
-      trailer
     }
   }
 `;

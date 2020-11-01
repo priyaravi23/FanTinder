@@ -33,22 +33,20 @@ const resolvers = {
                 .populate('likedMovies');
         },
 
-        // get a movie by _id
-        movies: async (parent, { movieId }) => {
-            return Movie.findOne({ _id: movieId })
-                .select('-__v');
-        },
-
         // get a movie by id
         movie: async (parent, { movieId }) => {
             return Movie.findOne({ _id: movieId })
-                .select('-__v');
+                .select('-__v')
+                .populate('dislikedUsers')
+                .populate('likedUsers');
         },
 
         // get all movies
         movies: async () => {
             return Movie.find()
-                .select('-__v');
+                .select('-__v')
+                .populate('dislikedUsers')
+                .populate('likedUsers');
         }
     },
 
@@ -100,32 +98,16 @@ const resolvers = {
             return movie;
         },
 
-        addMovies: async (parent, { input }) => {
-            // prep docs to upsert
-            const bulkOps = await input.map((movie) => {
-                return {
-                    updateOne: {
-                        filter: { externalMovieId: movie.externalMovieId },
-                        update: movie,
-                        upsert: true,
-                        new: true
-                    }
-                }
-            })
-            
-            // upsert all of the movies
-            const movieCount = await Movie.bulkWrite(bulkOps).then(res => {
-                const { modifiedCount, upsertedCount } = res;
-                return modifiedCount || upsertedCount;
-            }).catch(err => {
-                console.error(err);
-            });
-
-            return movieCount
-        },
-
         likeMovie: async (parent, { movieId }, context) => {
             if (context.user) {
+                Movie.findByIdAndUpdate(
+                    { _id: movieId },
+                    {
+                        $addToSet: { likedUsers: context.user._id },
+                        $pull: { dislikedUsers: context.user._id }
+                    }
+                )
+
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     {
@@ -144,6 +126,14 @@ const resolvers = {
 
         dislikeMovie: async (parent, { movieId }, context) => {
             if (context.user) {
+                Movie.findByIdAndUpdate(
+                    { _id: movieId },
+                    {
+                        $addToSet: { dislikedUsers: context.user._id },
+                        $pull: { likedUsers: context.user._id }
+                    }
+                )
+
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     {

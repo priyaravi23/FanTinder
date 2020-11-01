@@ -23,9 +23,25 @@ export const LOGIN_USER = gql`
                 email
                 likedMovies {
                     _id
+                    externalMovieId
+                    title
+                    overview
+                    releaseDate
+                    rating
+                    voteCount
+                    poster
+                    trailer
                 }
                 dislikedMovies{
                     _id
+                    externalMovieId
+                    title
+                    overview
+                    releaseDate
+                    rating
+                    voteCount
+                    poster
+                    trailer
                 }
             }
         }
@@ -44,12 +60,15 @@ export const ADD_MOVIE = gql`
             voteCount
             poster
             trailer
+            likedUsers {
+                _id
+                username
+            }
+            dislikedUsers {
+                _id
+                username
+            }
         }
-    }
-`
-export const ADD_MOVIES = gql`
-    mutation addMovies($input: [MovieInput!]) {
-        addMovies(input:$input)
     }
 `
 
@@ -58,9 +77,25 @@ export const LIKE_MOVIE = gql`
         likeMovie(movieId: $movieId) {
             likedMovies {
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
             dislikedMovies{
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
         }
     }
@@ -71,9 +106,25 @@ export const DISLIKE_MOVIE = gql`
         dislikeMovie(movieId: $movieId) {
             likedMovies {
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
             dislikedMovies{
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
         }
     }

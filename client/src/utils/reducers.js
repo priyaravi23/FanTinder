@@ -4,9 +4,8 @@ import {
     ADD_TO_MOVIES,
     UPDATE_MOVIES,
     ADD_TO_DISLIKED_MOVIES,
-    UPDATE_DISLIKED_MOVIES,
     ADD_TO_LIKED_MOVIES,
-    UPDATE_LIKED_MOVIES
+    UPDATE_MOVIE_PREFERENCES
  }
 from '../utils/actions';
 
@@ -20,13 +19,13 @@ export const reducer = (state, action) => {
         case ADD_TO_LIKED_MOVIES:
             return {
                 ...state,
-                likedMovies: [...state.likedMovies, action.movieId],
-                dislikedMovies: state.dislikedMovies.filter(dislikedMovieId => dislikedMovieId !== action.movieId),
+                likedMovies: [...state.likedMovies, action.movie],
+                dislikedMovies: state.dislikedMovies.length === 1 ? [] : state.dislikedMovies.filter(dislikedMovie => dislikedMovie._id !== action.movie._id),
             }
         case ADD_TO_DISLIKED_MOVIES:
             return {
                 ...state,
-                likedMovies: state.likedMovies.filter(likedMovieId => likedMovieId !== action.movieId),
+                likedMovies: state.likedMovies.length === 1 ? [] : state.likedMovies.filter(likedMovie => likedMovie._id !== action.movie._id),
                 dislikedMovies: [...state.dislikedMovies, action.movie],
             }
         case UPDATE_MOVIES:
@@ -34,15 +33,11 @@ export const reducer = (state, action) => {
                 ...state,
                 movies: action.movies
             }
-        case UPDATE_DISLIKED_MOVIES:
+        case UPDATE_MOVIE_PREFERENCES:
             return {
                 ...state,
                 dislikedMovies: action.dislikedMovies,
-            }
-        case UPDATE_LIKED_MOVIES:
-            return {
-                ...state,
-                likedMovies: action.likedMovies,
+                likedMovies: action.likedMovies
             }
         default:
             return state ? state : '';
