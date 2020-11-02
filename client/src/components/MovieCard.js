@@ -1,9 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 // import bootstrap-react components
-import { Accordion, AccordionContext, Button, Card, ResponsiveEmbed, Row, Col } from 'react-bootstrap';
+import { Accordion, AccordionContext, Button, Card, Modal, ResponsiveEmbed, Row, Col } from 'react-bootstrap';
 import StarRatings from 'react-star-ratings';
 import { useAccordionToggle } from 'react-bootstrap/AccordionToggle';
+import {
+    MdChevronRight,
+    MdChevronLeft,
+    MdFavoriteBorder,
+    MdClose,
+    MdKeyboardArrowDown,
+    MdKeyboardArrowUp
+} from "react-icons/md";
+
 
 // import utils
 import Auth from '../utils/auth';
@@ -12,13 +21,15 @@ import { useFantinderContext } from "../utils/GlobalState";
 const MovieCard = (props) => {
     const [state, ] = useFantinderContext();
     const { likedMovies, dislikedMovies } = state;
+    const [showModal, setShowModal] = useState(false);
     const {
         movie,
         displayTrailer,
         likeMovieHandler,
         dislikeMovieHandler,
-        skipMovieHandler,
-        displaySkip
+        displaySkip,
+        nextMovieHandler,
+        prevMovieHandler
     } = props;
 
     function ContextAwareToggle({ eventKey, callback }) {
@@ -34,20 +45,64 @@ const MovieCard = (props) => {
         return (
             <Button
                 variant="link"
-                className={`link ${isCurrentEventKey ? 'text-muted' : '' }`}
+                className={isCurrentEventKey ? 'text-muted p-0' : 'p-0'}
                 onClick={decoratedOnClick}
             >
                 {isCurrentEventKey
-                ?   <span className="small">Collapse <i className="fas fa-chevron-up"></i></span>
-                :   <span className="small">Click for details <i className="fas fa-chevron-down"></i></span>
+                ?   <span className="small">Collapse <MdKeyboardArrowUp /></span>
+                :   <span className="small">Click for details <MdKeyboardArrowDown /></span>
                 }
             </Button>
         );
-    }      
+    }
+
+    const displayLikedUsers = (likedUsers) => {
+        if (!likedUsers.length) {
+            return null
+        }
+
+        // get the usernames
+        const otherUsers = likedUsers.filter(user => user._id !== state.currentUser);
+        const usernames = otherUsers.filter(user => user.username).map(user => user.username);
+
+        // format the liked users for the card
+        switch (true) {
+            case (otherUsers.length === 0):
+                return (
+                    <Card.Text className='small'>
+                        No other users have liked this movie!
+                    </Card.Text>
+                )
+            case (otherUsers.length === 1):
+                return (
+                    <Card.Text className='small'>
+                        {usernames[0]} {otherUsers.length < likedUsers.length ? 'also' : null } liked this movie
+                    </Card.Text>
+                )
+            case (otherUsers.length === 2):
+                return (
+                    <Card.Text className='small'>
+                            {usernames[0]} and {usernames[1]} {otherUsers.length < likedUsers.length ? 'also' : null } liked this movie
+                    </Card.Text>
+                )
+            case (otherUsers.length > 2):
+                const otherLength = otherUsers.length - 2;
+                return (
+                    <Button variant="link" onClick={() => setShowModal(true)} className="p-0">
+                        <span className="small">
+                            {usernames[0]}, {usernames[1]}, and {otherLength} other {otherLength === 1 ? 'user' : 'users'} {otherUsers.length < likedUsers.length ? 'also' : null } liked this movie
+                        </span>
+                    </Button>
+                )
+            default:
+                return null
+        }
+    }
 
     return (
         movie
-        ?   <Accordion>
+        ?   <>
+            <Accordion>
             <Card>
                 {displayTrailer && movie.trailer
                     ? <ResponsiveEmbed aspectRatio="16by9">
@@ -63,11 +118,9 @@ const MovieCard = (props) => {
                     : (movie.poster && <Card.Img src={movie.poster} alt={`The cover for ${movie.title}`} variant='top' />)
                 }
                 <Card.Body>
-                    <Card.Title>
-                        {movie.title}
-                    </Card.Title>
+                    <Card.Title>{movie.title}</Card.Title>
                     <Row>
-                        <Col sm={6}>
+                        <Col xs={6}>
                             { movie.rating >= 0
                             ?   <StarRatings
                                     rating={movie.rating/2}
@@ -79,7 +132,7 @@ const MovieCard = (props) => {
                             :   null
                             }
                             <Card.Text className="small">
-                            ({movie.voteCount?.toLocaleString()} ratings)
+                                ({movie.voteCount?.toLocaleString()} ratings)
                             </Card.Text>
                         </Col>
                         <Col className="text-right">
@@ -87,50 +140,81 @@ const MovieCard = (props) => {
                         </Col>
                     </Row>
                 </Card.Body>
-                    <Accordion.Collapse eventKey={movie._id}>
-                        <Card.Body>
-                            <Card.Text>Plot Summary</Card.Text>
-                            <Card.Text className='small'>{movie.overview}</Card.Text>
-                            <Card.Text className='small'>Release Date: {movie.releaseDate}</Card.Text>
-                            <Card.Text className='small'>
-                                {`${movie.likedUsers.length} ${movie.likedUsers.length === 1 ? 'user' : 'users'} liked this movie`}
-                            </Card.Text>
-                        </Card.Body>
-                    </Accordion.Collapse>
+                <Accordion.Collapse eventKey={movie._id}>
+                    <Card.Body>
+                        <Card.Text>Plot Summary</Card.Text>
+                        <Card.Text className='small'>{movie.overview}</Card.Text>
+                        <Card.Text className='small'>Release Date: {movie.releaseDate}</Card.Text>
+                        {movie.likedUsers
+                            ? displayLikedUsers(movie.likedUsers)
+                            : <Card.Text className='small'>No users have liked this movie</Card.Text>   
+                        }
+                    </Card.Body>
+                </Accordion.Collapse>
 
-                {Auth.loggedIn()
-                ?   <Card.Footer className="d-flex justify-content-between">
-                        <Button
-                            className="movie-card-button"
-                            disabled={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)}
-                            variant={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id) ? "outline-secondary" : "outline-danger"}
-                            onClick={() => dislikeMovieHandler(movie)}>
-                                {dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)
-                                ? <span>Disliked!</span>
-                                : <i className='far fa-thumbs-down fa-2x' />}
+                <Card.Footer className="d-flex justify-content-center align-items-center">
+                    { displaySkip
+                    ?   <Button
+                            className="btn-round-sm mr-3"
+                            variant={"outline-secondary"}
+                            onClick={() => prevMovieHandler()}
+                        >
+                            <MdChevronLeft />
                         </Button>
-                        <Button
-                            className="movie-card-button"
-                            disabled={likedMovies?.some(likedMovie => likedMovie._id === movie._id)}
-                            variant={likedMovies?.some(likedMovie => likedMovie._id === movie._id) ? "outline-secondary" : "outline-success"}
-                            onClick={() => likeMovieHandler(movie)}>
-                                {likedMovies?.some(likedMovie => likedMovie._id === movie._id)
-                                ? <span>Liked!</span>
-                                : <i className='far fa-thumbs-up fa-2x' />}
-                        </Button>
-                    </Card.Footer>
-                :   displaySkip &&
-                        <Card.Footer className="text-center">
+                    :   null }
+                    {Auth.loggedIn()
+                    ?   <>
                             <Button
-                                className="movie-card-button"
-                                size="lg"
-                                onClick={skipMovieHandler}>
-                                    Next Movie
+                                className="btn-round-lg mr-3"
+                                disabled={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)}
+                                variant={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id) ? "outline-secondary" : "outline-danger"}
+                                onClick={() => dislikeMovieHandler(movie)}
+                            >
+                                <MdClose />
                             </Button>
-                        </Card.Footer>
-                }
+                            <Button
+                                className="btn-round-lg mr-3"
+                                disabled={likedMovies?.some(likedMovie => likedMovie._id === movie._id)}
+                                variant={likedMovies?.some(likedMovie => likedMovie._id === movie._id) ? "outline-secondary" : "outline-success"}
+                                onClick={() => likeMovieHandler(movie)}
+                            >
+                                <MdFavoriteBorder />
+                            </Button>
+                        </>
+                    :   null }
+                    { displaySkip
+                    ?   <Button
+                            className="btn-round-sm"
+                            variant={"outline-secondary"}
+                            onClick={() => nextMovieHandler()}
+                        >
+                            <MdChevronRight />
+                        </Button>
+                    :   null }
+                </Card.Footer>
                 </Card>
             </Accordion>
+            <Modal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                aria-labelledby='liked-users-modal'>
+                {/* tab container to do either signup or login component */}
+                <Modal.Header closeButton>
+                    <Modal.Title id='liked-users-modal' className="text-dark">
+                        Other users who liked this movie
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-dark">
+                    {movie.likedUsers?.filter(user => user._id !== state.currentUser).map(user => {
+                        return (
+                            <Row className="mb-1 mt-1" key={user._id}>
+                                <Col className="text-left">{user.username}</Col>
+                            </Row>
+                        )
+                    })}
+                </Modal.Body>
+            </Modal>
+            </>
         :   null
     )
 }

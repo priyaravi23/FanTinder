@@ -2,6 +2,7 @@
 import {
     ADD_TO_MOVIES,
     UPDATE_MOVIES,
+    UPDATE_CURRENT_USER,
     UPDATE_MOVIE_PREFERENCES
 } from '../utils/actions';
 
@@ -10,6 +11,7 @@ import { reducer } from '../utils/reducers';
 
 // create a sample of what our global state will look like
 const initialState = {
+    currentUser: 111,
     likedMovies: [
         {
             "externalMovieId": 1,
@@ -60,6 +62,16 @@ test('UPDATE_MOVIES', () => {
     expect(newState.movies.length).toBe(1);
     expect(newState.movies[0].externalMovieId).toBe(5);
     expect(initialState.movies.length).toBe(1);
+});
+
+test('UPDATE_CURRENT_USER', () => {
+    let newState = reducer(initialState, {
+        type: UPDATE_CURRENT_USER,
+        userId: 123
+    });
+
+    expect(newState.currentUser).toBe(123);
+    expect(initialState.currentUser).toBe(111);
 });
 
 test('UPDATE_MOVIE_PREFERENCES', () => {

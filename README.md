@@ -1,19 +1,37 @@
-# FANTINDER 
-## Developed with the MERN stack
-### Introduction
-Github Repository
-``` text 
-anitapeppercorn/FANTINDER
+# FanTinder (MERN Stack)
+
+### Github Repository
+
+https://github.com/priyaravi23/FanTinder
+
+### Application Deployment 
+
+https://fan-tinder.herokuapp.com/
+
+
+### Deployment Instructions
+
+```text
+Heroku
+1. heroku create app_name
+2. git remote -v
+3. git push heroku master
+
+MongoDB
+1. Create a new database in MongoDB Atlas Account
+2. Create a user for the database
+3. Copy the connection string that MongoDB Atlas gives you, go to your application's Settings tab through the Heroku dashboard, and paste the connection string as an environment variable under the name (or key) of MONGODB_URI
+
+Example: 
+
+mongodb+srv://fantinderuser:P@ssword123@cluster0.twmms.mongodb.net/fantinder_db?retryWrites=true&w=majority
 ```
 
-``` text
-App is Deployed at:
-https://fantinder.herokuapp.com/
+### Project Requirements
 
-```
-
-We built a full stack - MERN Stack media streaming site and deployed it to Heroku at https://fantinder.herokuapp.com/ This project has played a key role in our journey to becoming a full-stack web developers. It showcases collaborative skills and coding abilities, especially in the context of a scalable, user-focused MERN app.
+```text
 Project Requirements were to to create a MERN stack single-page application that works with real-world data to solve a real-world challenge, with a focus on user demand:
+
 - Using React for the front end.
 - Using GraphQL with a Node.js and Express.js server.
 - Using MongoDB and the Mongoose ODM for the database.
@@ -24,7 +42,7 @@ Project Requirements were to to create a MERN stack single-page application that
 - Including authentication (JWT) and protects sensitive API key information on the server.
 - The project has a clean repository that meets quality coding standards (file structure, naming conventions, best practices for class and id naming conventions, indentation, quality comments, etc.) and a high-quality README (with unique name, description, technologies used, screenshot, and link to deployed application).
 - This project is part of our REACT portfolio 
-
+```
 
 ## Contents
 - [Description](#Description)
@@ -35,14 +53,10 @@ Project Requirements were to to create a MERN stack single-page application that
 - [License](#License)
 - [Author](#Author)
 
+
 ## Description
-We are in a time where travel options are limited and a lot of people are spending time at home and watching movies together. Selecting a movie to watch together is always challenge. This is a application that makes that process simpler
-For MVP we assume that application users will communicate with each other outside the application only
-Additional potential features we considered
-….Feature 1: The movies in personalized profile favorites will show the other users (small bubble) who also have the same movie saved. 
-….Feature 2: On clicking on the bubble of a user who is interested in the same content as you, you will see more information (profile information) about them
-….Feature 3: As opposed to contact the user externally you can contact another use in app, via an in app chat
-….Feature 4: Not all users are friends, and users profile favorite content will be compared to their pre-approved friends only
+
+*We are in a time where travel options are limited and a lot of people are spending time at home and watching movies together. Selecting a movie to watch together is always a challenge. This app allows users to connect with others who share similar preferences.*
 
 ## App Screenshot
 ![](images/FANTINDER.png)
@@ -51,18 +65,15 @@ Additional potential features we considered
 ## User Story
 
 ```text
-
 AS A movie-lover stuck at home, 
 I WANT to see the latest trending movies, 
 Search for, Save, & Delete Movies,
 and connect with other users with matching preferences
 ```
 
-
-
 ## Acceptance Criteria
-```text
 
+```text
 GIVEN an Movie Search web application & platform 
 WHEN I review the app
 THEN I am presented with movie recommendations and Navbar options to search the Movie database and options to Login/Signup
@@ -113,8 +124,6 @@ THEN I am logged out of the site and presented with a menu with the options to s
 
 ```
 
-
-
 ## Concepts
 
 In this project we used the following packages:
@@ -145,21 +154,22 @@ In this project we used the following packages:
 ![license](https://img.shields.io/badge/License-MIT-blue)
 
 ## Author
-### Vanessa Lane, Anita Ganti, Priya Ravi
+### Priya Ravi, Vanessa Lane, Anita Ganti
 
-View the authors' portfolio at:  
-- https://anitapeppercorn.github.io/react-portfolio/
-![Badge](https://img.shields.io/badge/Github-anitapeppercorn-4cbbb9) 
-![Profile Image](https://github.com/anitapeppercorn.png?size=50)
+https://priyaravi23.github.io/react-portfolio/
 
-
-- https://priyaravi23.github.io/react-portfolio/
 ![Badge](https://img.shields.io/badge/Github-priyaravi23-4cbbb9) 
 ![Profile Image](https://github.com/priyaravi23.png?size=50)
 
+http://www.vlane.net
 
-- http://www.vlane.net
 ![Badge](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
+![Profile Image](https://github.com/vanessalane.png?size=50)
+
+https://anitapeppercorn.github.io/react-portfolio/
+
+![Badge](https://img.shields.io/badge/Github-anitapeppercorn-4cbbb9) 
+![Profile Image](https://github.com/anitapeppercorn.png?size=50)
 
 
 [Table of Contents](#Contents)

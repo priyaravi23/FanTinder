@@ -11,7 +11,7 @@ import { GET_USER } from '../utils/queries';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 // Global State
 import { useFantinderContext } from "../utils/GlobalState";
-import { UPDATE_MOVIE_PREFERENCES } from '../utils/actions';
+import { ADD_TO_MOVIES, UPDATE_CURRENT_USER, UPDATE_MOVIE_PREFERENCES } from '../utils/actions';
 // IndexedDB
 import { idbPromise } from "../utils/helpers";
 import { findIndexByAttr } from '../utils/helpers'
@@ -35,6 +35,10 @@ const SearchMovies = () => {
         // if we're online, use server to update movie preferences
         if (!likedMovies.length && !dislikedMovies.length) {
             if (data && data.me) {
+                dispatch({
+                    type: UPDATE_CURRENT_USER,
+                    userId: data.me._id
+                })
                 if (data.me.likedMovies.length || !data.me.dislikedMovies.length) {
                     console.log("Online, using data from server to update movie preferences")
                     dispatch({
@@ -93,13 +97,25 @@ const SearchMovies = () => {
         for (let i=0; i < cleanedMovies.length; i++) {
 
             // add the movie to the DB
-            const { data } = await addMovie({
+            const result = await addMovie({
                 variables: { input: cleanedMovies[i] }
             })
 
+            const { data: newMovieData } = await result;
+            const { addMovie : newMovie } = await newMovieData;
+
+            // add the movie to the global store
+            dispatch({
+                type: ADD_TO_MOVIES,
+                movie: newMovie
+            })
+
+            // add to idb
+            idbPromise('movies', 'put', newMovie);
+
             // update searchedMovies state
             if (!addMovieError) {
-                updatedSearchedMovies.push(data.addMovie);
+                updatedSearchedMovies.push(newMovie);
             }
         };
 

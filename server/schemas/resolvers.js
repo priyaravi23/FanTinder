@@ -9,7 +9,12 @@ const resolvers = {
                 const userData = await User.findOne({ _id: context.user._id })
                     .select('-__v -password')
                     .populate('dislikedMovies')
-                    .populate('likedMovies');
+                    .populate({
+                       path: 'likedMovies',
+                       populate: {
+                         path: 'likedUsers'
+                       }
+                    });;
                 
                 return userData;
             }
@@ -19,12 +24,7 @@ const resolvers = {
 
         // get all users
         users: async () => {
-            return User.find()
-                .select('-__v -password')
-                .populate('dislikedMovies')
-                .populate('likedMovies')
-                .populate('Movie.dislikedUsers')
-                .populate('Movie.likedUsers');
+            return User.find().select('-__v -password');
         },
 
         // get a user by username
@@ -32,9 +32,12 @@ const resolvers = {
             return User.findOne({ username })
                 .select('-__v -password')
                 .populate('dislikedMovies')
-                .populate('likedMovies')
-                .populate('Movie.dislikedUsers')
-                .populate('Movie.likedUsers');
+                .populate({
+                   path: 'likedMovies',
+                   populate: {
+                     path: 'likedUsers'
+                   }
+                });
         },
 
         // get a movie by id
@@ -98,7 +101,8 @@ const resolvers = {
                 { externalMovieId: input.externalMovieId },
                 input,
                 { upsert: true, new: true }
-            );
+            ).populate('likedUsers');
+            
             return movie;
         },
 
@@ -121,9 +125,12 @@ const resolvers = {
                     { new: true }
                 )
                 .populate('dislikedMovies')
-                .populate('likedMovies')
-                .populate('Movie.dislikedUsers')
-                .populate('Movie.likedUsers');
+                .populate({
+                   path: 'likedMovies',
+                   populate: {
+                     path: 'likedUsers'
+                   }
+                });
 
                 return updatedUser;
             }
@@ -139,8 +146,6 @@ const resolvers = {
                         $pull: { likedUsers: context.user._id }
                     }
                 )
-                .populate('Movie.dislikedUsers')
-                .populate('Movie.likedUsers')
 
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
@@ -151,7 +156,12 @@ const resolvers = {
                     { new: true }
                 )
                 .populate('dislikedMovies')
-                .populate('likedMovies');
+                .populate({
+                   path: 'likedMovies',
+                   populate: {
+                     path: 'likedUsers'
+                   }
+                });
 
                 return updatedUser;
             }

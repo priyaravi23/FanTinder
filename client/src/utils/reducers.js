@@ -3,6 +3,7 @@ import { useReducer } from 'react';
 import { 
     ADD_TO_MOVIES,
     UPDATE_MOVIES,
+    UPDATE_CURRENT_USER,
     UPDATE_MOVIE_PREFERENCES
  }
 from '../utils/actions';
@@ -18,6 +19,11 @@ export const reducer = (state, action) => {
             return {
                 ...state,
                 movies: action.movies
+            }
+        case UPDATE_CURRENT_USER:
+            return {
+                ...state,
+                currentUser: action.userId
             }
         case UPDATE_MOVIE_PREFERENCES:
             return {

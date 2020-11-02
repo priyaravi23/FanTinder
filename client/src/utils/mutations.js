@@ -34,6 +34,7 @@ export const LOGIN_USER = gql`
                     likedUsers {
                         _id
                         username
+                        email
                     }
                 }
                 dislikedMovies{
@@ -49,6 +50,7 @@ export const LOGIN_USER = gql`
                     likedUsers {
                         _id
                         username
+                        email
                     }
                 }
             }
@@ -71,6 +73,7 @@ export const ADD_MOVIE = gql`
             likedUsers {
                 _id
                 username
+                email
             }
         }
     }
@@ -92,6 +95,7 @@ export const LIKE_MOVIE = gql`
                 likedUsers {
                     _id
                     username
+                    email
                 }
             }
             dislikedMovies{
@@ -107,6 +111,7 @@ export const LIKE_MOVIE = gql`
                 likedUsers {
                     _id
                     username
+                    email
                 }
             }
         }
