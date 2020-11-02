@@ -31,6 +31,10 @@ export const LOGIN_USER = gql`
                     voteCount
                     poster
                     trailer
+                    likedUsers {
+                        _id
+                        username
+                    }
                 }
                 dislikedMovies{
                     _id
@@ -42,6 +46,10 @@ export const LOGIN_USER = gql`
                     voteCount
                     poster
                     trailer
+                    likedUsers {
+                        _id
+                        username
+                    }
                 }
             }
         }
@@ -64,10 +72,6 @@ export const ADD_MOVIE = gql`
                 _id
                 username
             }
-            dislikedUsers {
-                _id
-                username
-            }
         }
     }
 `
@@ -85,6 +89,10 @@ export const LIKE_MOVIE = gql`
                 voteCount
                 poster
                 trailer
+                likedUsers {
+                    _id
+                    username
+                }
             }
             dislikedMovies{
                 _id
@@ -96,6 +104,10 @@ export const LIKE_MOVIE = gql`
                 voteCount
                 poster
                 trailer
+                likedUsers {
+                    _id
+                    username
+                }
             }
         }
     }
@@ -114,6 +126,10 @@ export const DISLIKE_MOVIE = gql`
                 voteCount
                 poster
                 trailer
+                likedUsers {
+                    _id
+                    username
+                }
             }
             dislikedMovies{
                 _id
@@ -125,6 +141,10 @@ export const DISLIKE_MOVIE = gql`
                 voteCount
                 poster
                 trailer
+                likedUsers {
+                    _id
+                    username
+                }
             }
         }
     }

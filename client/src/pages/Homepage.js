@@ -10,18 +10,13 @@ import { GET_USER } from '../utils/queries';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 // Global State
 import { useFantinderContext } from "../utils/GlobalState";
-import {
-    ADD_TO_MOVIES,
-    ADD_TO_DISLIKED_MOVIES,
-    ADD_TO_LIKED_MOVIES,
-    UPDATE_MOVIE_PREFERENCES,
-    UPDATE_MOVIES
-} from '../utils/actions';
+import { ADD_TO_MOVIES, UPDATE_MOVIE_PREFERENCES, UPDATE_MOVIES } from '../utils/actions';
 // IndexedDB
 import { idbPromise } from "../utils/helpers";
 import { cleanMovieData } from '../utils/movieData';
 // Other Utils
 import Auth from '../utils/auth';
+import { findIndexByAttr } from '../utils/helpers'
 
 const Homepage = () => {
     const [state, dispatch] = useFantinderContext();
@@ -69,14 +64,21 @@ const Homepage = () => {
     useEffect(() => {
         if (movies.length && movieIndex === '') {// show the next movie
             console.log('There are movies, but no movieIndex. Setting movieIndex')
-            for (let i=0; i < movies.length; i++) {
-                const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
-                const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
+            // if they're logged in, set it to the first movie they haven't actioned
+            if (Auth.loggedIn()){
+                for (let i=0; i < movies.length; i++) {
+                    const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
+                    const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
 
-                if (!isLiked && !isDisliked && movies[i].trailer) {
-                    setMovieIndex(i);
-                    break;
+                    if (!isLiked && !isDisliked && movies[i].trailer) {
+                        setMovieIndex(i);
+                        break;
+                    }
                 }
+            }
+            // if they're logged in, set it to the first movie in the deck
+            else {
+                setMovieIndex(0);
             }
         }
     }, [setMovieIndex, dislikedMovies, likedMovies, movies, movieIndex]);
@@ -141,17 +143,23 @@ const Homepage = () => {
         likeMovie({
             variables: { movieId: likedMovie._id }
         })
-        .then(data => {
+        .then(({data}) => {
+            console.log(data.likeMovie)
             if (data) {
                 // update global state
                 dispatch({
-                    type: ADD_TO_LIKED_MOVIES,
-                    movie: likedMovie
+                    type: UPDATE_MOVIE_PREFERENCES,
+                    likedMovies: data.likeMovie.likedMovies,
+                    dislikedMovies: data.likeMovie.dislikedMovies
                 });
     
+                // find the updated movie
+                const likedMovieIndex = findIndexByAttr(data.likeMovie.likedMovies, '_id', likedMovie._id);
+                const updatedLikedMovie = data.likeMovie.likedMovies[likedMovieIndex];
+
                 // update idb
-                idbPromise('likedMovies', 'put', likedMovie);
-                idbPromise('dislikedMovies', 'delete', likedMovie);
+                idbPromise('likedMovies', 'put', updatedLikedMovie);
+                idbPromise('dislikedMovies', 'delete', updatedLikedMovie);
 
                 // skip to the next movie
                 handleSkipMovie();
@@ -167,17 +175,22 @@ const Homepage = () => {
         dislikeMovie({
             variables: { movieId: dislikedMovie._id }
         })
-        .then(data => {
+        .then(async ({data}) => {
             if (data) {
                 // update global state
                 dispatch({
-                    type: ADD_TO_DISLIKED_MOVIES,
-                    movie: dislikedMovie
+                    type: UPDATE_MOVIE_PREFERENCES,
+                    likedMovies: data.dislikeMovie.likedMovies,
+                    dislikedMovies: data.dislikeMovie.dislikedMovies
                 });
     
+                // find the updated movie
+                const dislikedMovieIndex = await findIndexByAttr(data.dislikeMovie.dislikedMovies, '_id', dislikedMovie._id);
+                const updatedDislikedMovie = data.dislikeMovie.dislikedMovies[dislikedMovieIndex];
+    
                 // update idb
-                idbPromise('likedMovies', 'delete', dislikedMovie);
-                idbPromise('dislikedMovies', 'put', dislikedMovie);
+                idbPromise('likedMovies', 'delete', updatedDislikedMovie);
+                idbPromise('dislikedMovies', 'put', updatedDislikedMovie);
 
                 // skip to the next movie
                 handleSkipMovie();

@@ -22,7 +22,9 @@ const resolvers = {
             return User.find()
                 .select('-__v -password')
                 .populate('dislikedMovies')
-                .populate('likedMovies');
+                .populate('likedMovies')
+                .populate('Movie.dislikedUsers')
+                .populate('Movie.likedUsers');
         },
 
         // get a user by username
@@ -30,7 +32,9 @@ const resolvers = {
             return User.findOne({ username })
                 .select('-__v -password')
                 .populate('dislikedMovies')
-                .populate('likedMovies');
+                .populate('likedMovies')
+                .populate('Movie.dislikedUsers')
+                .populate('Movie.likedUsers');
         },
 
         // get a movie by id
@@ -100,7 +104,7 @@ const resolvers = {
 
         likeMovie: async (parent, { movieId }, context) => {
             if (context.user) {
-                Movie.findByIdAndUpdate(
+                const updatedMovie = await Movie.findByIdAndUpdate(
                     { _id: movieId },
                     {
                         $addToSet: { likedUsers: context.user._id },
@@ -111,13 +115,15 @@ const resolvers = {
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     {
-                        $addToSet: { likedMovies: movieId },
-                        $pull: { dislikedMovies: movieId }
+                        $addToSet: { likedMovies: updatedMovie._id },
+                        $pull: { dislikedMovies: updatedMovie._id }
                     },
                     { new: true }
                 )
                 .populate('dislikedMovies')
-                .populate('likedMovies');
+                .populate('likedMovies')
+                .populate('Movie.dislikedUsers')
+                .populate('Movie.likedUsers');
 
                 return updatedUser;
             }
@@ -126,19 +132,21 @@ const resolvers = {
 
         dislikeMovie: async (parent, { movieId }, context) => {
             if (context.user) {
-                Movie.findByIdAndUpdate(
+                const updatedMovie = await Movie.findByIdAndUpdate(
                     { _id: movieId },
                     {
                         $addToSet: { dislikedUsers: context.user._id },
                         $pull: { likedUsers: context.user._id }
                     }
                 )
+                .populate('Movie.dislikedUsers')
+                .populate('Movie.likedUsers')
 
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     {
-                        $addToSet: { dislikedMovies: movieId },
-                        $pull: { likedMovies: movieId }
+                        $addToSet: { dislikedMovies: updatedMovie._id },
+                        $pull: { likedMovies: updatedMovie._id }
                     },
                     { new: true }
                 )

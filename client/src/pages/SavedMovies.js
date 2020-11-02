@@ -8,13 +8,10 @@ import { GET_USER } from '../utils/queries';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 // Global State
 import { useFantinderContext } from "../utils/GlobalState";
-import { 
-    ADD_TO_DISLIKED_MOVIES,
-    ADD_TO_LIKED_MOVIES,
-    UPDATE_MOVIE_PREFERENCES
-} from '../utils/actions';
+import { UPDATE_MOVIE_PREFERENCES } from '../utils/actions';
 // IDB
 import { idbPromise } from "../utils/helpers";
+import { findIndexByAttr } from '../utils/helpers'
 
 const SavedMovies = () => {
     // State
@@ -55,24 +52,29 @@ const SavedMovies = () => {
             }
         }
     }, [data, loading, likedMovies, dislikedMovies, dispatch])
-    
+
     const handleLikeMovie = (likedMovie) => {
         // update the db
         likeMovie({
             variables: { movieId: likedMovie._id }
         })
-        .then(data => {
+        .then(({data}) => {
+            console.log(data.likeMovie)
             if (data) {
                 // update global state
                 dispatch({
-                    type: ADD_TO_LIKED_MOVIES,
-                    movie: likedMovie
+                    type: UPDATE_MOVIE_PREFERENCES,
+                    likedMovies: data.likeMovie.likedMovies,
+                    dislikedMovies: data.likeMovie.dislikedMovies
                 });
     
-                // update idb
-                idbPromise('likedMovies', 'put', likedMovie);
-                idbPromise('dislikedMovies', 'delete', likedMovie);
+                // find the updated movie
+                const likedMovieIndex = findIndexByAttr(data.likeMovie.likedMovies, '_id', likedMovie._id);
+                const updatedLikedMovie = data.likeMovie.likedMovies[likedMovieIndex];
 
+                // update idb
+                idbPromise('likedMovies', 'put', updatedLikedMovie);
+                idbPromise('dislikedMovies', 'delete', updatedLikedMovie);
             } else {
                 console.error("Couldn't like the movie!");
             }
@@ -85,18 +87,22 @@ const SavedMovies = () => {
         dislikeMovie({
             variables: { movieId: dislikedMovie._id }
         })
-        .then(data => {
+        .then(async ({data}) => {
             if (data) {
                 // update global state
                 dispatch({
-                    type: ADD_TO_DISLIKED_MOVIES,
-                    movie: dislikedMovie
+                    type: UPDATE_MOVIE_PREFERENCES,
+                    likedMovies: data.dislikeMovie.likedMovies,
+                    dislikedMovies: data.dislikeMovie.dislikedMovies
                 });
     
+                // find the updated movie
+                const dislikedMovieIndex = await findIndexByAttr(data.dislikeMovie.dislikedMovies, '_id', dislikedMovie._id);
+                const updatedDislikedMovie = data.dislikeMovie.dislikedMovies[dislikedMovieIndex];
+    
                 // update idb
-                idbPromise('likedMovies', 'delete', dislikedMovie);
-                idbPromise('dislikedMovies', 'put', dislikedMovie);
-
+                idbPromise('likedMovies', 'delete', updatedDislikedMovie);
+                idbPromise('dislikedMovies', 'put', updatedDislikedMovie);
             } else {
                 console.error("Couldn't dislike the movie!");
             }
@@ -113,14 +119,14 @@ const SavedMovies = () => {
             </Jumbotron>
             <Container>
                 <h2 className="pb-5">
-                    {likedMovies?.length > 0 
+                    {likedMovies.length 
                     ? `Displaying ${likedMovies.length} saved ${likedMovies.length === 1 ? "movie" : "movies"}:`
                     : "You have no saved movies!"   
                     }
                     
                 </h2>
                 <CardColumns>
-                    {likedMovies?.length
+                    {likedMovies?.length && likedMovies.length > 0
                     ? likedMovies.map(movie => {
                         return (
                             <MovieCard
